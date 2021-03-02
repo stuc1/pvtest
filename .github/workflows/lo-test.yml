@@ -23,9 +23,9 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo sysctl vm.swappiness=0
-          sudo rm -rf /usr/share/dotnet #/usr/local/lib/android/sdk
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk &
           sudo -E apt update
-          sudo -E apt -y --no-upgrade --no-install-recommends install jq zstd secure-delete build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf intltool rsync swig &
+          sudo -E apt -y --no-install-recommends install jq build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python python3 python-pip python3-pip python-ply python3-ply haveged lrzsz device-tree-compiler scons antlr3 gperf intltool rsync swig &
 
       - uses: actions/checkout@v2
         with:
@@ -34,37 +34,34 @@ jobs:
       - name: Checkout
         run: |
           cd
-          sudo curl https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
+          sudo curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
           for i in {1..6}
           do
-           curl -s -L --fail https://404.github.com/klever1988/sshactions/releases/download/cache/lede.${{ github.event.client_payload.device }}.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 40g lede.img && mkfs.xfs lede.img)
+           curl -sL --fail https://404.github.com/klever1988/sshactions/releases/download/cache/lede.${{ github.event.client_payload.device || github.event.inputs.device }}.img.zst.0$i || break
+          done | zstdmt -d -o lede.img || (truncate -s 35g lede.img && mkfs.xfs lede.img)
           LOOP_DEVICE=$(losetup -f) && echo $LOOP_DEVICE > LOOP_DEVICE
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
-          mkdir lede && sudo mount $LOOP_DEVICE lede && sudo chown -R $USER:$(id -gn) lede
-          [ ! -e lede/.git ] && (cd lede && git init && git remote add -t openwrt-18.06-k5.4 -f origin https://github.com/immortalwrt/immortalwrt && git checkout openwrt-18.06-k5.4)
+          mkdir lede && sudo mount $LOOP_DEVICE lede
+          if [ -d 'lede/.git' ]; then
           cd lede && git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && git pull --ff -X theirs
+          else
+          sudo chown $USER:$(id -gn) lede && (cd lede && git init && git remote add -t openwrt-18.06-k5.4 -f origin https://github.com/immortalwrt/immortalwrt && git checkout openwrt-18.06-k5.4)
+          fi
 
       - name: Update feeds and packages
         run: |
           cd ~/lede
-          git clone --depth=1 https://github.com/destan19/OpenAppFilter.git && rm -rf package/OpenAppFilter && mv OpenAppFilter package/
-          git clone --depth=1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git && rm -rf package/lean/luci-theme-argon && mv luci-theme-argon package/lean/
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          git clone --depth=1 https://github.com/destan19/OpenAppFilter.git && rm -rf package/OpenAppFilter && mv OpenAppFilter package/
+          git clone --depth=1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git && rm -rf package/lean/luci-theme-argon && mv luci-theme-argon package/lean/
 
       - name: Custom configure file
         run: |
           cd ~/lede
           rm -f .config*
           cat $GITHUB_WORKSPACE/${{ github.event.client_payload.device || github.event.inputs.device }}.config.seed > .config
-          sed -i 's/^[ \t]*//g' .config
-          echo '
-          # CONFIG_v2ray-plugin_INCLUDE_GOPROXY is not set
-          # CONFIG_XRAY_CORE_COMPRESS_GOPROXY is not set
-          # CONFIG_UnblockNeteaseMusicGo_INCLUDE_GOPROXY is not set
-          ' >> .config
-          make defconfig && cat .config
+          cat .config
 
       - name: Debug via tmate
         uses: P3TERX/ssh2actions@main
@@ -76,20 +73,23 @@ jobs:
       - name: Compile firmware
         run: |
           cd ~/lede
-          
+
           if [[ ${{ github.event.client_payload.device || github.event.inputs.device }} =~ ('r2s'|'r4s') ]]; then
             sdk_src='https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-sdk-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
           elif [[ ${{ github.event.client_payload.device || github.event.inputs.device }} == 'r1s' ]]; then
             sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa53/openwrt-sdk-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
           fi
-          mkdir sdk && wget -cO- $sdk_src | tar -xJf - -C sdk
+          mkdir sdk && wget -qO- $sdk_src | tar -xJf - -C sdk
           mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
           rm -rf sdk
+          ln -sf /usr/bin/upx-ucl staging_dir/host/bin/upx
           sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
           echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
+          make defconfig
 
           while true; do make download -j && break || true; done
-          make -j$(($(nproc) + 1)) -s || (make clean && make -j1 V=sc)
+          while true; do make package/download -j && break || true; done
+          make -j$(($(nproc) + 1)) || make V=sc
           echo "======================="
           echo "Space usage:"
           echo "======================="
@@ -121,8 +121,6 @@ jobs:
           sudo umount lede
           LOOP_DEVICE=$(cat LOOP_DEVICE)
           sudo losetup -d $LOOP_DEVICE
-          #zstdmt -c lede.img | split -d -b 2000m - lede.${{ github.event.client_payload.device || github.event.inputs.device }}.img.zst.
-          #ls -l *zst*
 
       - name: Deliver buildinfo
         uses: actions/upload-artifact@v2
@@ -173,7 +171,6 @@ jobs:
 
       - name: Send tg notification
         uses: appleboy/telegram-action@master
-        #if: always()
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
