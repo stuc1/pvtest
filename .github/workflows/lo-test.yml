@@ -131,17 +131,6 @@ jobs:
           overwrite: true
           release_name: ${{ env.strDevice }} ${{ env.strDate }} 自动发布
 
-      - name: Save cache state
-        run: |
-          export AUTH="Authorization: token ${{ secrets.SEC_TOKEN }}"
-          export cache_path='github.com/repos/klever1988/sshactions/releases'
-          export cache_repo_id='39020554'
-          ret=$(curl -sH "$AUTH" "https://api.$cache_path/tags/cache")
-          echo $ret | jq -r '.assets[] | select(.name | contains ("'${{ github.event.client_payload.device }}'")).id' | \
-          xargs -n1 -i curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
-          zstdmt -c --adapt --long lede.img | parallel --wc --block 1.99G --pipe \
-          'curl -s --data-binary @- -H "$AUTH" -H "Content-Type: application/octet-stream" https://uploads.$cache_path/$cache_repo_id/assets?name=lede.'${{ github.event.client_payload.device }}'.img.zst.0{#} > /dev/null'
-
       - name: Debug via tmate
         uses: P3TERX/ssh2actions@main
         if: ${{ failure() }}
