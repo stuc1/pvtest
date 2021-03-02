@@ -76,6 +76,18 @@ jobs:
       - name: Compile firmware
         run: |
           cd ~/lede
+          
+          if [[ ${{ github.event.client_payload.device || github.event.inputs.device }} =~ ('r2s'|'r4s') ]]; then
+            sdk_src='https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-sdk-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
+          elif [[ ${{ github.event.client_payload.device || github.event.inputs.device }} == 'r1s' ]]; then
+            sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa53/openwrt-sdk-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
+          fi
+          mkdir sdk && wget -cO- $sdk_src | tar -xJf - -C sdk
+          mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
+          rm -rf sdk
+          sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
+          echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
+
           while true; do make download -j && break || true; done
           make -j$(($(nproc) + 1)) -s || (make clean && make -j1 V=sc)
           echo "======================="
