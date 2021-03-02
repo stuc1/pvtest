@@ -6,6 +6,10 @@ on:
         description: 'select device to build'
         default: 'r2s'
         required: false
+      debug:
+        description: 'debug?'
+        default: 'true'
+        required: true
 
 jobs:
   build:
@@ -17,4 +21,5 @@ jobs:
             -X POST https://api.github.com/repos/${{ github.repository }}/dispatches \
             -H "Accept: application/vnd.github.everest-preview+json" \
             -H "Authorization: token ${{ secrets.SEC_TOKEN }}" \
-            -d '{"event_type": "${{ github.event.inputs.device }}", "client_payload": {"device": "${{ github.event.inputs.device }}"}}'
+            -d '{"event_type": "${{ github.event.inputs.device }}", "client_payload": {"device": "${{ github.event.inputs.device }}", "debug": "${{ github.event.inputs.debug }}"}}' \
+            -v

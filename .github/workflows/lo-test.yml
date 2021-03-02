@@ -33,20 +33,21 @@ jobs:
 
       - name: Checkout
         run: |
+          cd
           sudo curl https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
           for i in {1..6}
           do
-           curl -s -L --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.${{ github.event.client_payload.device || github.event.inputs.device }}.img.zst.0$i || break
+           curl -s -L --fail https://404.github.com/klever1988/sshactions/releases/download/cache/lede.${{ github.event.client_payload.device }}.img.zst.0$i || break
           done | zstdmt -d -o lede.img || (truncate -s 40g lede.img && mkfs.xfs lede.img)
           LOOP_DEVICE=$(losetup -f) && echo $LOOP_DEVICE > LOOP_DEVICE
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
-          mkdir lede && sudo mount $LOOP_DEVICE lede && sudo chown -R $USER:$USER lede
+          mkdir lede && sudo mount $LOOP_DEVICE lede && sudo chown -R $USER:$(id -gn) lede
           [ ! -e lede/.git ] && (cd lede && git init && git remote add -t openwrt-18.06-k5.4 -f origin https://github.com/immortalwrt/immortalwrt && git checkout openwrt-18.06-k5.4)
           cd lede && git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && git pull --ff -X theirs
 
       - name: Update feeds and packages
         run: |
-          cd lede/
+          cd ~/lede
           git clone --depth=1 https://github.com/destan19/OpenAppFilter.git && rm -rf package/OpenAppFilter && mv OpenAppFilter package/
           git clone --depth=1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git && rm -rf package/lean/luci-theme-argon && mv luci-theme-argon package/lean/
           ./scripts/feeds update -a
@@ -54,9 +55,9 @@ jobs:
 
       - name: Custom configure file
         run: |
-          cd lede
+          cd ~/lede
           rm -f .config*
-          cat ../${{ github.event.client_payload.device || github.event.inputs.device }}.config.seed > .config
+          cat $GITHUB_WORKSPACE/${{ github.event.client_payload.device || github.event.inputs.device }}.config.seed > .config
           sed -i 's/^[ \t]*//g' .config
           echo '
           # CONFIG_v2ray-plugin_INCLUDE_GOPROXY is not set
@@ -65,9 +66,16 @@ jobs:
           ' >> .config
           make defconfig && cat .config
 
+      - name: Debug via tmate
+        uses: P3TERX/ssh2actions@main
+        if: ${{ github.event.client_payload.debug == 'true' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
       - name: Compile firmware
         run: |
-          cd lede
+          cd ~/lede
           while true; do make download -j && break || true; done
           make -j$(($(nproc) + 1)) -s || (make clean && make -j1 V=sc)
           echo "======================="
@@ -81,6 +89,7 @@ jobs:
 
       - name: Prepare artifact
         run: |
+          cd
           mkdir -p ./artifact/firmware
           mkdir -p ./artifact/package
           mkdir -p ./artifact/buildinfo
@@ -96,7 +105,7 @@ jobs:
           echo "strDevice=$(echo ${{ github.event.client_payload.device || github.event.inputs.device }} | awk '{print toupper($0)}')" >> $GITHUB_ENV
           rm -rf bin/ tmp/
           cd ..
-          rm -f *zst*
+          mv artifact release $GITHUB_WORKSPACE
           sudo umount lede
           LOOP_DEVICE=$(cat LOOP_DEVICE)
           sudo losetup -d $LOOP_DEVICE
@@ -133,6 +142,7 @@ jobs:
 
       - name: Save cache state
         run: |
+          cd
           export AUTH="Authorization: token ${{ secrets.SEC_TOKEN }}"
           export cache_path='github.com/repos/klever1988/sshactions/releases'
           export cache_repo_id='39020554'
