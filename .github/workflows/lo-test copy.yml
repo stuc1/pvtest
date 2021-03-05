@@ -41,7 +41,7 @@ jobs:
           for i in {1..6}
           do
            curl -sL --fail https://404.github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 10g lede.img && mkfs.btrfs -M lede.img)
+          done | zstdmt -d -o lede.img || (truncate -s 11g lede.img && mkfs.btrfs -M lede.img)
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
           mkdir lede && sudo mount -o nossd,autodefrag,compress=zstd $LOOP_DEVICE lede
@@ -61,9 +61,7 @@ jobs:
       - name: Custom configure file
         run: |
           cd ~/lede
-          rm -f .config*
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed > .config
-          cat .config
 
       - name: Debug via tmate
         uses: P3TERX/ssh2actions@main
@@ -84,10 +82,10 @@ jobs:
           mkdir sdk && wget -qO- $sdk_src | tar -xJf - -C sdk
           rm -rf build_dir staging_dir; mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
           rm -rf sdk
-          make tools/upx/compile
+          #make tools/upx/compile
           sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
           echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
-          #grep -l -r --include=\Makefile '(STAGING_DIR_HOST)/bin/upx ' | xargs -n1 -i sed -i '/upx/d' {}
+          grep -l -r --include=\Makefile '(STAGING_DIR_HOST)/bin/upx ' | xargs -n1 -i sed -i '/upx/d' {}
 
           make defconfig
 
