@@ -38,15 +38,13 @@ jobs:
         run: |
           cd
           sudo curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
-          for i in {1..6}
-          do
-           curl -sL --fail https://404.github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 11g lede.img && mkfs.btrfs -M lede.img)
+          truncate -s 11g lede.img && mkfs.btrfs -M lede.img
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
-          mkdir lede && sudo mount -o nossd,autodefrag,compress=zstd $LOOP_DEVICE lede
+          mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
           if [ -d 'lede/.git' ]; then
-          cd lede && git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && git pull --ff -X theirs
+          cd lede
+          git fetch && git reset --hard origin/openwrt-18.06-k5.4 && git merge openwrt-18.06 || true
           else
           sudo chown $USER:$(id -gn) lede && (cd lede && git init && git remote add -t openwrt-18.06-k5.4 -f origin https://github.com/immortalwrt/immortalwrt && git checkout openwrt-18.06-k5.4)
           fi
@@ -56,7 +54,6 @@ jobs:
           cd ~/lede
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          . $GITHUB_WORKSPACE/merge_packages.sh
 
       - name: Custom configure file
         run: |
@@ -74,6 +71,7 @@ jobs:
         run: |
           cd ~/lede
 
+          if [ ! -d build_dir ]; then
           if [[ $DEVICE =~ ('r2s'|'r4s') ]]; then
             sdk_src='https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-sdk-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
           elif [[ $DEVICE == 'r1s' ]]; then
@@ -82,10 +80,11 @@ jobs:
           mkdir sdk && wget -qO- $sdk_src | tar -xJf - -C sdk
           rm -rf build_dir staging_dir; mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
           rm -rf sdk
-          #make tools/upx/compile
+          fi
+          make defconfig && make tools/upx/compile && make tools/upx/install
           sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
           echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
-          grep -l -r --include=\Makefile '(STAGING_DIR_HOST)/bin/upx ' | xargs -n1 -i sed -i '/upx/d' {}
+          #grep -l -r --include=\Makefile '(STAGING_DIR_HOST)/bin/upx ' | xargs -n1 -i sed -i '/upx/d' {}
 
           make defconfig
 
@@ -100,56 +99,10 @@ jobs:
           du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
           du -h --max-depth=1 ./build_dir
           du -h --max-depth=1 ./bin
-
-      - name: Prepare artifact
-        run: |
-          cd
-          mkdir -p ./artifact/firmware
-          mkdir -p ./artifact/package
-          mkdir -p ./artifact/buildinfo
-          mkdir -p ./release
-          cd lede
-          rm -rf $(find ./bin/targets/ -type d -name "packages")
-          cp -rf $(find ./bin/targets/ -type f) ../artifact/firmware/
-          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ../artifact/package/
-          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ../artifact/buildinfo/
-          cp $(ls -1 ../artifact/firmware/*img*) ../release/$DEVICE.img.gz
-          pushd ../release/ && md5sum $DEVICE.img.gz > md5sum.txt && popd
-          echo "strDate=$(date +%Y-%m-%d)" >> $GITHUB_ENV
-          echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
           rm -rf bin/ tmp/
           cd ..
-          mv artifact release $GITHUB_WORKSPACE
           sudo umount lede
           sudo losetup -d $LOOP_DEVICE
-
-      - name: Deliver buildinfo
-        uses: actions/upload-artifact@v2
-        with:
-          name: OpenWrt_buildinfo
-          path: ./artifact/buildinfo/
-
-      - name: Deliver package
-        uses: actions/upload-artifact@v2
-        with:
-          name: OpenWrt_package
-          path: ./artifact/package/
-
-      - name: Deliver firmware
-        uses: actions/upload-artifact@v2
-        with:
-          name: OpenWrt_firmware
-          path: ./artifact/firmware/
-
-      - name: Upload release asset
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./release/*
-          tag: ${{env.DEVICE}}-${{env.strDate}}
-          file_glob: true
-          overwrite: true
-          release_name: ${{env.strDevice}} ${{env.strDate}} 自动发布
 
       - name: Save cache state
         run: |
