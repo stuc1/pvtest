@@ -71,6 +71,8 @@ jobs:
             sdk_src='https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-sdk-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
           elif [[ $DEVICE == 'r1s' ]]; then
             sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa53/openwrt-sdk-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
+          elif [ $DEVICE == 'r1s-h3' ]; then
+            sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa7/openwrt-sdk-sunxi-cortexa7_gcc-8.4.0_musl_eabi.Linux-x86_64.tar.xz'
           fi
           mkdir sdk && wget -qO- $sdk_src | tar -xJf - -C sdk
           rm -rf build_dir staging_dir; mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
