@@ -53,9 +53,7 @@ jobs:
       - name: Custom configure file
         run: |
           cd ~/lede
-          rm -f .config*
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed > .config
-          cat .config
 
       - name: Debug via tmate
         uses: P3TERX/ssh2actions@main
@@ -97,7 +95,6 @@ jobs:
           du -h --max-depth=1 ./build_dir
           du -h --max-depth=1 ./bin
           rm -rf bin/ tmp/
-          cd ..
 
       - name: Save cache state
         if: env.TG
