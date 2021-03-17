@@ -56,6 +56,10 @@ jobs:
       - name: Update feeds and packages
         run: |
           cd ~/lede
+          if [ -d 'feeds' ]; then
+            pushd feeds/packages; git restore .; popd
+            pushd feeds/luci; git restore .; popd
+          fi
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           . $GITHUB_WORKSPACE/patches.sh
