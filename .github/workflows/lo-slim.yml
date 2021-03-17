@@ -91,7 +91,6 @@ jobs:
 
           while true; do make download -j && break || true; done
           while true; do make package/download -j && break || true; done
-          make package/feeds/packages/ttyd/clean
           make -j$(($(nproc) + 1)) || make V=sc
           echo "======================="
           echo "Space usage:"
@@ -193,8 +192,6 @@ jobs:
           sudo btrfs filesystem resize max lede/
           mv bin tmp lede/
           cd lede
-          cat $GITHUB_WORKSPACE/$DEVICE.config.seed > .config
-          echo >> .config
           find package/ -type d -name luci-app-*ss* | rev | cut -d'/' -f1 | rev | sort | xargs -n1 -i echo CONFIG_PACKAGE_{}=y >> .config
           make defconfig
           make download -j
