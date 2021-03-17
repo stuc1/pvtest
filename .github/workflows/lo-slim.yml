@@ -89,6 +89,7 @@ jobs:
           echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
 
           make defconfig
+          cat .config
 
           while true; do make download -j && break || true; done
           while true; do make package/download -j && break || true; done
@@ -194,6 +195,7 @@ jobs:
           mv bin tmp lede/
           cd lede
           p_kernel_digest=$(cat bin/targets/*/*/*.manifest | grep kernel | tail -c 33 | tr -d "\n")
+          echo $p_kernel_digest
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed > .config
           echo >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | sort | xargs -n1 -i echo CONFIG_PACKAGE_{}=y >> .config
@@ -203,6 +205,7 @@ jobs:
           make package/compile -j$(($(nproc) + 1)) IGNORE_ERRORS=y
           make package/index
           n_kernel_digest=$(cat bin/targets/*/*/*.manifest | grep kernel | tail -c 33 | tr -d "\n")
+          echo $n_kernel_digest
           sed -i "s/$n_kernel_digest/$p_kernel_digest/" bin/targets/*/*/packages/Packages bin/targets/*/*/packages/Packages.manifest
           gzip -f bin/targets/*/*/packages/Packages
           mkdir -p ~/.ssh; echo ${{env.DEPLOY_SSHKEY}} | base64 -d > ~/.ssh/id_ed25519; chmod 600 ~/.ssh/id_ed25519
