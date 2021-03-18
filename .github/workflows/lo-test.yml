@@ -46,12 +46,13 @@ jobs:
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
+          sudo btrfs filesystem resize max lede/
           if [ -d 'lede/.git' ]; then
           cd lede && git config --local user.email "action@github.com" && git config --local user.name "GitHub Action"
           git remote set-branches --add origin openwrt-18.06
           git fetch && git reset --hard origin/openwrt-18.06-k5.4 && git merge --commit --no-edit origin/openwrt-18.06
           else
-          sudo chown $USER:$(id -gn) lede && (cd lede && git init && git remote add -t openwrt-18.06-k5.4 -f origin https://github.com/immortalwrt/immortalwrt && git checkout openwrt-18.06-k5.4)
+          sudo chown $USER:$(id -gn) lede && (cd lede && git init && git remote add -t master -f origin https://github.com/immortalwrt/immortalwrt && git checkout master)
           fi
 
       - name: Update feeds and packages
@@ -137,7 +138,6 @@ jobs:
           mv $(ls -1 ./bin/targets/*/*/*img.gz) ../release/$DEVICE-slim.img.gz
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
-          rm -rf bin tmp
           cd ..
           mv artifact release $GITHUB_WORKSPACE
           cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE-slim.img.gz > $DEVICE-slim.img.md5
@@ -169,7 +169,7 @@ jobs:
           export cache_path='github.com/repos/klever1988/sshactions/releases'
           export cache_repo_id='39020554'
           ret=$(curl -sH "$AUTH" "https://api.$cache_path/tags/cache")
-          echo $ret | jq -r '.assets[] | select(.name | contains ("'$DEVICE'.img")).id' | \
+          echo $ret | jq -r '.assets[] | select(.name | contains ("'$DEVICE'-slim.img")).id' | \
           xargs -n1 -i curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
           #zstdmt -c --adapt --long lede.img | parallel --wc --block 1.99G --pipe \
           #'curl -s --data-binary @- -H "$AUTH" -H "Content-Type: application/octet-stream" https://uploads.$cache_path/$cache_repo_id/assets?name=lede.'$DEVICE'.img.zst.0{#} > /dev/null'
