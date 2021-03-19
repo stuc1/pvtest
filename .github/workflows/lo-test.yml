@@ -39,10 +39,6 @@ jobs:
         run: |
           cd
           sudo curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
-          for i in {1..10}
-          do
-            curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 20g lede.img && mkfs.btrfs -M lede.img)
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
@@ -118,6 +114,7 @@ jobs:
           gzip -f bin/targets/*/*/packages/Packages
 
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
+          echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
           echo >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo "# CONFIG_PACKAGE_{} is not set" >> .config
           make defconfig
@@ -205,7 +202,7 @@ jobs:
 
   generate_firmware:
     needs: build_packages
-    if: always()
+    #if: always()
     name: Generate ${{ github.event.client_payload.device || github.event.inputs.device }} firmware
     runs-on: ubuntu-18.04
     env:
