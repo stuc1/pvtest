@@ -13,7 +13,7 @@ jobs:
 
   build_packages:
     name: Build ${{ github.event.client_payload.device || github.event.inputs.device }} packages
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     env:
       DEVICE: ${{ github.event.client_payload.device || github.event.inputs.device }}
       TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -39,6 +39,9 @@ jobs:
         run: |
           cd
           sudo curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
+          sudo umount lede || true
+          sudo losetup -d /dev/loop0 || true
+          rm -r lede* || true
           for i in {1..10}
           do
             curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
@@ -69,7 +72,6 @@ jobs:
       - name: Custom configure file
         run: |
           cd ~/lede
-          make defconfig && make tools/upx/compile -j$(($(nproc) + 1))
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
           echo >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo "# CONFIG_PACKAGE_{} is not set" >> .config
@@ -202,7 +204,7 @@ jobs:
 
   generate_firmware:
     needs: build_packages
-    if: always()
+    #if: always()
     name: Generate ${{ github.event.client_payload.device || github.event.inputs.device }} firmware
     runs-on: ubuntu-18.04
     env:
