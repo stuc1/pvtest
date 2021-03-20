@@ -13,7 +13,7 @@ jobs:
 
   build_packages:
     name: Build ${{ github.event.client_payload.device || github.event.inputs.device }} packages
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     env:
       DEVICE: ${{ github.event.client_payload.device || github.event.inputs.device }}
       TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -39,6 +39,9 @@ jobs:
         run: |
           cd
           sudo curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
+          sudo umount lede || true
+          sudo losetup -d /dev/loop0 || true
+          rm -r lede* || true
           for i in {1..10}
           do
             curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
@@ -69,7 +72,6 @@ jobs:
       - name: Custom configure file
         run: |
           cd ~/lede
-          make defconfig && make tools/upx/compile -j$(($(nproc) + 1))
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
           echo >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo "# CONFIG_PACKAGE_{} is not set" >> .config
@@ -102,6 +104,10 @@ jobs:
           rm -rf build_dir staging_dir; mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
           rm -rf sdk
           fi
+          sed -i '/182.140.223.146/d' scripts/download.pl
+          sed -i '/\.cn\//d' scripts/download.pl
+          sed -i '/tencent/d' scripts/download.pl
+          make defconfig && make tools/upx/compile -j$(($(nproc) + 1))
           sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
 
           echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
@@ -177,8 +183,13 @@ jobs:
           ret=$(curl -sH "$AUTH" "https://api.$cache_path/tags/cache")
           echo $ret | jq -r '.assets[] | select(.name | contains ("'$DEVICE'.img")).id' | \
           xargs -n1 -i curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
-          zstdmt -c --adapt --long lede.img | parallel --wc --block 1.99G --pipe \
-          'curl -s --data-binary @- -H "$AUTH" -H "Content-Type: application/octet-stream" https://uploads.$cache_path/$cache_repo_id/assets?name=lede.'$DEVICE'.img.zst.0{#} > /dev/null'
+          #zstdmt -c --adapt --long lede.img | parallel --wc --block 1.99G --pipe \
+          #'curl -s --data-binary @- -H "$AUTH" -H "Content-Type: application/octet-stream" https://uploads.$cache_path/$cache_repo_id/assets?name=lede.'$DEVICE'.img.zst.0{#} > /dev/null'
+          zstdmt -c --long lede.img | split -d -b 2000m - lede.$DEVICE.img.zst.
+          for f in *img.zst*
+          do
+            while true; do curl --data-binary @$f -H "$AUTH" -H 'Content-Type: application/octet-stream' "https://uploads.$cache_path/$cache_repo_id/assets?name=$f" && break || true; done
+          done
 
       - name: Send tg notification
         uses: appleboy/telegram-action@master
@@ -202,7 +213,7 @@ jobs:
 
   generate_firmware:
     needs: build_packages
-    if: always()
+    #if: always()
     name: Generate ${{ github.event.client_payload.device || github.event.inputs.device }} firmware
     runs-on: ubuntu-18.04
     env:
