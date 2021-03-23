@@ -11,7 +11,7 @@ CONFIG_TARGET_ROOTFS_EXT4FS=y
 
 CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
 CONFIG_PACKAGE_ipv6helper=y
-CONFIG_PACKAGE_luci-theme-argon=y
+CONFIG_PACKAGE_luci-theme-argonv3=y
 CONFIG_PACKAGE_luci-theme-edge=y
 CONFIG_PACKAGE_luci-theme-material=y
 CONFIG_PACKAGE_luci-theme-netgear=y
@@ -43,34 +43,143 @@ CONFIG_DROPBEAR_ECC_FULL=y
 CONFIG_PACKAGE_zram-swap=y
 CONFIG_PACKAGE_autocore-arm=y
 
-
-# CONFIG_PACKAGE_luci-app-aria2 is not set
+# CONFIG_PACKAGE_luci-app-accesscontrol is not set
+# CONFIG_PACKAGE_luci-app-adbyby-plus is not set
 # CONFIG_PACKAGE_luci-app-adguardhome is not set
+# CONFIG_PACKAGE_luci-app-advancedsetting is not set
+# CONFIG_PACKAGE_luci-app-airplay2 is not set
+# CONFIG_PACKAGE_luci-app-airwhu is not set
+# CONFIG_PACKAGE_luci-app-aliddns is not set
+# CONFIG_PACKAGE_luci-app-amule is not set
 # CONFIG_PACKAGE_luci-app-appfilter is not set
+# CONFIG_PACKAGE_luci-app-argon-config is not set
+# CONFIG_PACKAGE_luci-app-arpbind is not set
+# CONFIG_PACKAGE_luci-app-autoipsetadder is not set
+# CONFIG_PACKAGE_luci-app-autoreboot is not set
 # CONFIG_PACKAGE_luci-app-baidupcs-web is not set
-# CONFIG_PACKAGE_luci-app-frpc is not set
-# CONFIG_PACKAGE_luci-app-ipsec-vpnd is not set
-CONFIG_PACKAGE_luci-app-cifsd=y
-# CONFIG_PACKAGE_luci-app-ddnsto is not set
+# CONFIG_PACKAGE_luci-app-beardropper is not set
+# CONFIG_PACKAGE_luci-app-brook is not set
+# CONFIG_PACKAGE_luci-app-brook-server is not set
+# CONFIG_PACKAGE_luci-app-cd8021x is not set
+# CONFIG_PACKAGE_luci-app-chinadns is not set
+# CONFIG_PACKAGE_luci-app-cifs is not set
+# CONFIG_PACKAGE_luci-app-cifs-mount is not set
+# CONFIG_PACKAGE_luci-app-cpufreq is not set
+# CONFIG_PACKAGE_luci-app-cpulimit is not set
+# CONFIG_PACKAGE_luci-app-cupsd is not set
 # CONFIG_PACKAGE_luci-app-diskman is not set
-# CONFIG_PACKAGE_luci-app-godproxy is not set
-CONFIG_PACKAGE_luci-app-jd-dailybonus=y
+# CONFIG_PACKAGE_luci-app-dnsforwarder is not set
+# CONFIG_PACKAGE_luci-app-docker is not set
+# CONFIG_PACKAGE_luci-app-dockerman is not set
+# CONFIG_PACKAGE_luci-app-eqos is not set
+# CONFIG_PACKAGE_luci-app-familycloud is not set
+# CONFIG_PACKAGE_luci-app-fileassistant is not set
+# CONFIG_PACKAGE_luci-app-filebrowser is not set
+# CONFIG_PACKAGE_luci-app-filetransfer is not set
+# CONFIG_PACKAGE_luci-app-frpc is not set
+# CONFIG_PACKAGE_luci-app-frps is not set
+# CONFIG_PACKAGE_luci-app-gost is not set
+# CONFIG_PACKAGE_luci-app-gowebdav is not set
+# CONFIG_PACKAGE_luci-app-guest-wifi is not set
+# CONFIG_PACKAGE_luci-app-haproxy-tcp is not set
+# CONFIG_PACKAGE_luci-app-https_dns_proxy is not set
+# CONFIG_PACKAGE_luci-app-ipsec-vpnd is not set
+# CONFIG_PACKAGE_luci-app-ipsec-vpnserver-manyusers is not set
+# CONFIG_PACKAGE_luci-app-iptvhelper is not set
+# CONFIG_PACKAGE_luci-app-jd-dailybonus is not set
+# CONFIG_PACKAGE_luci-app-k3screenctrl is not set
+# CONFIG_PACKAGE_luci-app-k3usb is not set
+# CONFIG_PACKAGE_luci-app-kcptun is not set
+# CONFIG_PACKAGE_luci-app-kodexplorer is not set
+# CONFIG_PACKAGE_luci-app-ksmbd is not set
 # CONFIG_PACKAGE_luci-app-mentohust is not set
-CONFIG_PACKAGE_luci-app-netdata=y
+# CONFIG_PACKAGE_luci-app-minieap is not set
+# CONFIG_PACKAGE_luci-app-mtwifi is not set
+# CONFIG_PACKAGE_luci-app-music-remote-center is not set
+# CONFIG_PACKAGE_luci-app-mwan3helper is not set
+# CONFIG_PACKAGE_luci-app-mwol is not set
+# CONFIG_PACKAGE_luci-app-n2n_v2 is not set
+# CONFIG_PACKAGE_luci-app-naiveproxy is not set
+# CONFIG_PACKAGE_luci-app-netdata is not set
+# CONFIG_PACKAGE_luci-app-nfs is not set
 # CONFIG_PACKAGE_luci-app-nft-qos is not set
-# CONFIG_PACKAGE_luci-app-oaf is not set
+# CONFIG_PACKAGE_luci-app-nginx-pingos is not set
+# CONFIG_PACKAGE_luci-app-ngrokc is not set
+# CONFIG_PACKAGE_luci-app-njitclient is not set
+# CONFIG_PACKAGE_luci-app-nps is not set
+# CONFIG_PACKAGE_luci-app-oled is not set
+# CONFIG_PACKAGE_luci-app-onliner is not set
 # CONFIG_PACKAGE_luci-app-openclash is not set
 # CONFIG_PACKAGE_luci-app-openvpn-server is not set
+# CONFIG_PACKAGE_luci-app-oscam is not set
 # CONFIG_PACKAGE_luci-app-passwall is not set
-# CONFIG_PACKAGE_luci-app-pptp-server is not set
+# CONFIG_PACKAGE_luci-app-pppoe-relay is not set
+# CONFIG_PACKAGE_luci-app-pppoe-server is not set
+# CONFIG_PACKAGE_luci-app-ps3netsrv is not set
+# CONFIG_PACKAGE_luci-app-qbittorrent is not set
+# CONFIG_PACKAGE_luci-app-qosv4 is not set
+# CONFIG_PACKAGE_luci-app-ramfree is not set
+# CONFIG_PACKAGE_luci-app-rclone is not set
+# CONFIG_PACKAGE_luci-app-samba4 is not set
+# CONFIG_PACKAGE_luci-app-scutclient is not set
+# CONFIG_PACKAGE_luci-app-serverchan is not set
+# CONFIG_PACKAGE_luci-app-smartdns is not set
+# CONFIG_PACKAGE_luci-app-smartinfo is not set
+# CONFIG_PACKAGE_luci-app-smstool is not set
+# CONFIG_PACKAGE_luci-app-socat is not set
 # CONFIG_PACKAGE_luci-app-softethervpn is not set
-CONFIG_PACKAGE_luci-app-statistics=y
-# CONFIG_PACKAGE_luci-app-transmission is not set
+# CONFIG_PACKAGE_luci-app-softethervpn5 is not set
+# CONFIG_PACKAGE_luci-app-speederv2 is not set
+# CONFIG_PACKAGE_luci-app-ssocks is not set
+# CONFIG_PACKAGE_luci-app-ssr-libev-server is not set
+# CONFIG_PACKAGE_luci-app-ssr-mudb-server is not set
+# CONFIG_PACKAGE_luci-app-ssr-plus is not set
+# CONFIG_PACKAGE_luci-app-ssrserver-python is not set
+# CONFIG_PACKAGE_luci-app-syncdial is not set
+# CONFIG_PACKAGE_luci-app-syncthing is not set
+# CONFIG_PACKAGE_luci-app-sysuh3c is not set
+# CONFIG_PACKAGE_luci-app-terminal is not set
+# CONFIG_PACKAGE_luci-app-timecontrol is not set
+# CONFIG_PACKAGE_luci-app-timewol is not set
+# CONFIG_PACKAGE_luci-app-trojan-server is not set
 # CONFIG_PACKAGE_luci-app-ttyd is not set
-CONFIG_PACKAGE_luci-app-uhttpd=y
+# CONFIG_PACKAGE_luci-app-turboacc is not set
+# CONFIG_PACKAGE_luci-app-udp2raw is not set
+# CONFIG_PACKAGE_luci-app-unblockmusic is not set
+# CONFIG_PACKAGE_luci-app-unblockneteasemusic is not set
+# CONFIG_PACKAGE_luci-app-unblockneteasemusic-go is not set
+# CONFIG_PACKAGE_luci-app-unblockneteasemusic-mini is not set
+# CONFIG_PACKAGE_luci-app-usb3disable is not set
 # CONFIG_PACKAGE_luci-app-usb-printer is not set
-CONFIG_PACKAGE_luci-app-vnstat=y
+# CONFIG_PACKAGE_luci-app-uugamebooster is not set
+# CONFIG_PACKAGE_luci-app-v2ray-server is not set
+# CONFIG_PACKAGE_luci-app-verysync is not set
+# CONFIG_PACKAGE_luci-app-vlmcsd is not set
+# CONFIG_PACKAGE_luci-app-vsftpd is not set
 # CONFIG_PACKAGE_luci-app-vssr is not set
+# CONFIG_PACKAGE_luci-app-webadmin is not set
+# CONFIG_PACKAGE_luci-app-webrestriction is not set
+# CONFIG_PACKAGE_luci-app-weburl is not set
+# CONFIG_PACKAGE_luci-app-wrtbwmon is not set
+# CONFIG_PACKAGE_luci-app-xlnetacc is not set
+# CONFIG_PACKAGE_luci-app-xunlei is not set
 # CONFIG_PACKAGE_luci-app-zerotier is not set
+CONFIG_PACKAGE_luci-app-adbyby-plus=y
+CONFIG_PACKAGE_luci-app-argon-config=y
+CONFIG_PACKAGE_luci-app-arpbind=y
+CONFIG_PACKAGE_luci-app-cpufreq=y
+CONFIG_PACKAGE_luci-app-ddns=y
+CONFIG_PACKAGE_luci-app-jd-dailybonus=y
+CONFIG_PACKAGE_luci-app-netdata=y
+CONFIG_PACKAGE_luci-app-nlbwmon=y
+CONFIG_PACKAGE_luci-app-ssr-plus=y
+CONFIG_PACKAGE_luci-app-statistics=y
+CONFIG_PACKAGE_luci-app-turboacc=y
 CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_shortcut-fe=y
-
+CONFIG_PACKAGE_luci-app-uhttpd=y
+CONFIG_PACKAGE_luci-app-unblockmusic=y
+CONFIG_PACKAGE_luci-app-upnp=y
+CONFIG_PACKAGE_luci-app-vlmcsd=y
+CONFIG_PACKAGE_luci-app-vnstat=y
+CONFIG_PACKAGE_luci-app-wol=y
+CONFIG_PACKAGE_luci-app-xlnetacc=y
