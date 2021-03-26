@@ -19,5 +19,8 @@ mv $GITHUB_WORKSPACE/files ./
 chmod 600 files/etc/dropbear/*
 
 if [ $DEVICE = 'r4s' ]; then
-    git cherry-pick 6c3f6d2686679173b95495c47d861db1f41729dd
+    wget https://github.com/immortalwrt/immortalwrt/commit/6c3f6d2686679173b95495c47d861db1f41729dd.patch
+    sed -i 's/ctcgfw/kernel/g' 6c3f6d2686679173b95495c47d861db1f41729dd.patch
+    git apply 6c3f6d2686679173b95495c47d861db1f41729dd.patch
+    rm 6c3f6d2686679173b95495c47d861db1f41729dd.patch
 fi
