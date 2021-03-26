@@ -17,3 +17,7 @@ sed -i 's/192.168.1.1/192.168.2.1/' package/base-files/files/bin/config_generate
 rm -rf files
 mv $GITHUB_WORKSPACE/files ./
 chmod 600 files/etc/dropbear/*
+
+if [ $DEVICE = 'r4s' ]; then
+    git cherry-pick 6c3f6d2686679173b95495c47d861db1f41729dd
+fi
