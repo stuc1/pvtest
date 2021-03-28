@@ -55,7 +55,7 @@ jobs:
           #git remote set-branches --add origin openwrt-18.06
           #git merge -X theirs --no-edit origin/openwrt-18.06
           else
-          sudo chown $USER:$(id -gn) lede && git clone -b openwrt-18.06-k5.4 --single-branch lede
+          sudo chown $USER:$(id -gn) lede && git clone -b openwrt-18.06-k5.4 --single-branch https://github.com/immortalwrt/immortalwrt lede
           fi
 
       - name: Update feeds and packages
@@ -71,16 +71,18 @@ jobs:
           ./scripts/feeds install -a
           . $GITHUB_WORKSPACE/patches.sh
           . $GITHUB_WORKSPACE/merge_packages.sh
-          rm -rf package/base; mkdir -p package/base; cd ../
+          mkdir -p tmpkg; cd ../
           svn export https://github.com/openwrt/packages/trunk packages
           pushd packages
-          ls -d */ | xargs -n1 -i diff -q {} ../lede/feeds/packages/{} | grep Only | grep lede | grep -v -E lang\|devel\|ovn | awk '{print $3 $4}' | tr -d ':' | xargs -n1 -i mv {} ../lede/package/base/
-          sed -i 's/include ..\/..\//include $(TOPDIR)\/feeds\/packages\//' ../lede/package/base/*/Makefile ../lede/feeds/packages/devel/ninja/ninja-cmake.mk
+          ls -d */ | xargs -n1 -i diff -q {} ../lede/feeds/packages/{} | grep Only | grep lede | grep -v -E lang\|devel\|ovn | awk '{print $3 $4}' | tr -d ':' | xargs -n1 -i mv {} ../lede/tmpkg/
+          sed -i 's/include ..\/..\//include $(TOPDIR)\/feeds\/packages\//' ../lede/tmpkg/*/Makefile ../lede/feeds/packages/devel/ninja/ninja-cmake.mk
           popd
           svn export https://github.com/openwrt/luci/branches/openwrt-18.06 luci
           pushd luci
-          ls -d */ | xargs -n1 -i diff -q {} ../lede/feeds/luci/{} | grep Only | grep lede | grep -E applications\|themes | awk '{print $3 $4}' | tr -d ':' | xargs -n1 -i mv {} ../lede/package/base/
-          sed -i 's/include ..\/..\//include $(TOPDIR)\/feeds\/luci\//' ../lede/package/base/luci-*/Makefile
+          ls -d */ | xargs -n1 -i diff -q {} ../lede/feeds/luci/{} | grep Only | grep lede | grep -E applications\|themes | awk '{print $3 $4}' | tr -d ':' | xargs -n1 -i mv {} ../lede/tmpkg/
+          sed -i 's/include ..\/..\//include $(TOPDIR)\/feeds\/luci\//' ../lede/tmpkg/luci-*/Makefile
+          popd
+          cd lede; rsync -ach -del --no-t --progress tmpkg/ package/base/; rm tmpkg -rf
 
       - name: Custom configure file
         run: |
@@ -104,38 +106,19 @@ jobs:
       - name: Build and deploy packages
         run: |
           cd ~/lede
-
-          if [ ! -d build_dir ]; then
-          if [[ $DEVICE =~ ('r2s'|'r4s') ]]; then
-            sdk_src='https://downloads.openwrt.org/snapshots/targets/rockchip/armv8/openwrt-sdk-rockchip-armv8_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
-          elif [[ $DEVICE == 'r1s' ]]; then
-            sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa53/openwrt-sdk-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz'
-          elif [ $DEVICE == 'r1s-h3' ]; then
-            sdk_src='https://downloads.openwrt.org/snapshots/targets/sunxi/cortexa7/openwrt-sdk-sunxi-cortexa7_gcc-8.4.0_musl_eabi.Linux-x86_64.tar.xz'
-          fi
-          mkdir sdk && wget -qO- $sdk_src | tar -xJf - -C sdk
-          rm -rf build_dir staging_dir; mv sdk/*/build_dir ./ && rsync -a --ignore-existing sdk/*/staging_dir/ ./staging_dir/
-          rm -rf sdk
-          fi
-          sed -i '/182.140.223.146/d' scripts/download.pl
-          sed -i '/\.cn\//d' scripts/download.pl
-          sed -i '/tencent/d' scripts/download.pl
-          make defconfig && make tools/upx/compile -j$(($(nproc) + 1))
-          sed -i '/\(tools\|toolchain\)\/Makefile/d' Makefile
-
           cat $GITHUB_WORKSPACE/extra_packages.seed >> .config
-          echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo CONFIG_PACKAGE_{}=y >> .config
           make defconfig && cat .config
           while true; do make download -j && break || true; done
-          make target/linux/compile -j$(($(nproc) + 1))
-          make package/compile -j$(($(nproc) + 1)) IGNORE_ERRORS=y
+          make tools/compile -j$[`nproc`+1]
+          make toolchain/compile -j$[`nproc`+1]
+          make target/linux/compile -j$[`nproc`+1]
+          make package/compile -j$[`nproc`+1] IGNORE_ERRORS=y
           make package/index
           sed -i "s/\-[a-z0-9]\{32\})/)/" bin/targets/*/*/packages/Packages bin/targets/*/*/packages/Packages.manifest
           gzip -f bin/targets/*/*/packages/Packages
 
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
-          echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo "# CONFIG_PACKAGE_{} is not set" >> .config
           make defconfig
           mkdir -p files/local_feed/core files/local_feed/base
@@ -210,12 +193,9 @@ jobs:
           ls *img.zst* | parallel --wc 'while true; do curl -T {} -H "$AUTH" -H "Content-Type: application/octet-stream" "https://uploads.$cache_path/$cache_repo_id/assets?name={}" && break || true; done'
 
       - name: Send tg notification
-        uses: appleboy/telegram-action@master
         if: env.TG
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          args: The ${{env.DEVICE}} build ran completed at ${{job.status}}.
+        run: |
+          curl -k --data chat_id="${{secrets.TELEGRAM_CHAT_ID}}" --data "text=The ${{env.DEVICE}} build ran completed at ${{job.status}}." "https://api.telegram.org/bot${{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage"
 
       - name: Debug via tmate
         uses: klever1988/ssh2actions@main
@@ -258,8 +238,7 @@ jobs:
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
           cd lede
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed > .config
-          echo -e '# CONFIG_SIGNED_PACKAGES is not set\n' >> .config
-          make defconfig && make -j$(($(nproc) + 1))
+          make defconfig && make -j$[`nproc`+1]
           mkdir -p $GITHUB_WORKSPACE/release
           mv $(ls -1 ./bin/targets/*/*/*img.gz) $GITHUB_WORKSPACE/release/$DEVICE.img.gz
           cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE.img.gz > $DEVICE.img.md5
