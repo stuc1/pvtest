@@ -41,7 +41,7 @@ jobs:
           curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
           sudo umount lede || true
           sudo losetup -d /dev/loop0 || true
-          rm -r lede* || true
+          rm -r lede* luci packages || true
           for i in {1..10}
           do
             curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
