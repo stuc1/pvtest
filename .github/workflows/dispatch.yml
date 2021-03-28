@@ -10,6 +10,10 @@ on:
         description: 'debug?'
         default: 'true'
         required: true
+      cache_save:
+        description: 'check to save cache'
+        default: 'false'
+        required: true
 
 jobs:
   build:
