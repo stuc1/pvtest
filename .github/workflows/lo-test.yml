@@ -165,7 +165,7 @@ jobs:
           release_name: ${{env.strDate}} 自动发布
 
       - name: Save cache state
-        if: ${{ github.event.client_payload.debug == 'true' }}
+        if: ${{ github.event.client_payload.cache_save == 'true' }}
         run: |
           cd
           sleep 120
