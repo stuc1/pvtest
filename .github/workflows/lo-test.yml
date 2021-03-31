@@ -266,8 +266,8 @@ jobs:
           cat files/etc/opkg/distfeeds.conf
           sed -i 's/luci-app-[^ ]*//g' include/target.mk $(find target/ -name Makefile)
           sed -i 's/$(OPKG) install $(BUILD_PACKAGES)/$(OPKG) install --force-overwrite $(BUILD_PACKAGES)/' Makefile
-          PACKAGES=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | grep -v luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//;/dnsmasq_full_dhcpv6/d;/INCLUDE/d' | xargs echo)
-          PACKAGES=$(echo $PACKAGES `cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | grep luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//'`)
+          PACKAGES=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | sed '/dnsmasq_full_dhcpv6/d;/INCLUDE/d' | grep -v luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//' | xargs echo)
+          PACKAGES=$(echo $PACKAGES `cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | sed '/dnsmasq_full_dhcpv6/d;/INCLUDE/d' | grep luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//'`)
           LP=$(cd packages; cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//' | sed 's/app/i18n/' | xargs -n1 -i sh -c 'ls {}-zh-cn* 2>/dev/null' | sed 's/zh-.*.ipk/zh-cn/' | xargs echo;)
           make image PACKAGES="$PACKAGES $LP luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn" FILES="files"
 
