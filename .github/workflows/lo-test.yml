@@ -89,7 +89,7 @@ jobs:
       - name: Custom configure file
         run: |
           cd ~/lede
-          cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
+          cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed 's/\(CONFIG_PACKAGE_luci-app-.*=\)y/\1m/' > .config
 
       - name: Debug via tmate
         uses: klever1988/ssh2actions@main
@@ -112,17 +112,6 @@ jobs:
           while true; do make download -j && break || true; done
           make -j$[`nproc`+1] IGNORE_ERRORS=1
           mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
-
-          cat $GITHUB_WORKSPACE/$DEVICE.config.seed | sed '/CONFIG_PACKAGE_luci-app-/d' > .config
-          find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo "# CONFIG_PACKAGE_{} is not set" >> .config
-          make defconfig
-          mkdir -p files/local_feed/core files/local_feed/base
-          sudo mount --bind bin/targets/*/*/packages/ files/local_feed/core
-          sudo mount --bind bin/packages/*/base/ files/local_feed/base
-          pushd bin/ && . ../files/etc/opkg/distfeeds.conf | tee ../files/etc/opkg/distfeeds.conf && popd
-          make -j$[`nproc`+1]
-          sudo umount files/local_feed/core files/local_feed/base
-          rm files/etc/opkg/distfeeds.conf
 
           echo "======================="
           echo "Space usage:"
@@ -229,13 +218,13 @@ jobs:
           eval `cat .config | grep \" | head -n 10`
           . files/etc/opkg/distfeeds.conf | tee files/etc/opkg/distfeeds.conf
           mkdir -p files/local_feed && sudo mount --bind packages files/local_feed
-          sed -i 's/ luci-app-[^ ]*//g' include/target.mk $(find target/ -name Makefile)
+          sed -i 's/luci-app-[^ ]*//g' include/target.mk $(find target/ -name Makefile)
           sed -i 's/$(OPKG) install $(BUILD_PACKAGES)/$(OPKG) install --force-overwrite $(BUILD_PACKAGES)/' Makefile
           make image PACKAGES="$PACKAGES $LP luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn" FILES="files"
 
           mkdir -p $GITHUB_WORKSPACE/release
           mv $(ls -1 ./bin/targets/*/*/*img.gz) $GITHUB_WORKSPACE/release/$DEVICE-slim.img.gz
-          cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE.img.gz > $DEVICE-slim.img.md5
+          cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE-slim.img.gz > $DEVICE-slim.img.md5
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
 
@@ -274,9 +263,10 @@ jobs:
           . files/etc/opkg/distfeeds.conf | tee files/etc/opkg/distfeeds.conf
           sed -i '/local/d;s/#//' files/etc/opkg/distfeeds.conf
           cat files/etc/opkg/distfeeds.conf
-          sed -i 's/ luci-app-[^ ]*//g' include/target.mk $(find target/ -name Makefile)
+          sed -i 's/luci-app-[^ ]*//g' include/target.mk $(find target/ -name Makefile)
           sed -i 's/$(OPKG) install $(BUILD_PACKAGES)/$(OPKG) install --force-overwrite $(BUILD_PACKAGES)/' Makefile
-          PACKAGES=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | grep -v luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//;/dnsmasq_full_dhcpv6/d;/collectd/d' | xargs echo)
+          PACKAGES=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | grep -v luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//;/dnsmasq_full_dhcpv6/d;/INCLUDE/d' | xargs echo)
+          PACKAGES=$(echo $PACKAGES `cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep CONFIG_PACKAGE | grep luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//'`)
           LP=$(cd packages; cat $GITHUB_WORKSPACE/$DEVICE.config.seed | grep luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//' | sed 's/app/i18n/' | xargs -n1 -i sh -c 'ls {}-zh-cn* 2>/dev/null' | sed 's/zh-.*.ipk/zh-cn/' | xargs echo;)
           make image PACKAGES="$PACKAGES $LP luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn" FILES="files"
 
