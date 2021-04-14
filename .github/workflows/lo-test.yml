@@ -103,6 +103,7 @@ jobs:
         run: |
           cd ~/lede
           while true; do make download -j && break || true; done
+          sed -i 's/Kf9Qot2lLYccEzQfoCdt9img6zo5Vf+PEaoTMfa2S8k=/FGmf5rtUo3xGHyZGJi8jEa7AKin05ROfPtegmGbkCKg=/' build_dir/target-aarch64_generic_musl/v2ray-plugin-4.37.3/go.sum
           make -j$[`nproc`+1] IGNORE_ERRORS=1
           mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
 
