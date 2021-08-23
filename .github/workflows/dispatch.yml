@@ -14,6 +14,10 @@ on:
         description: 'check to save cache'
         default: 'false'
         required: true
+      package_clean:
+        description: 'check to make clean package'
+        default: 'false'
+        required: true
       runner:
         description: 'runner to run'
         default: 'ubuntu-18.04'
