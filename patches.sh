@@ -68,4 +68,4 @@ sed -i $line_number_h6',+10 s/font-weight: normal/font-weight: bold/' $css_file
 fi
 
 #set default theme to argon
-sed -i '/exit 0/i uci set luci.main.mediaurlbase=/luci-static/argon' `find package -type f -path '*/default-settings/files/zzz-default-settings'`
+sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon"' `find package -type f -path '*/default-settings/files/zzz-default-settings'`
