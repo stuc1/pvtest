@@ -36,6 +36,7 @@ jobs:
           fetch-depth: 1
 
       - name: Checkout
+        id: checkout
         run: |
           cd
           curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
@@ -56,21 +57,23 @@ jobs:
           else
           sudo chown $USER:$(id -gn) lede && git clone -b $BRANCH --single-branch https://github.com/immortalwrt/immortalwrt lede
           fi
+          cd ~/lede && hash=`git log --pretty=tformat:"%h" -n1 .` && echo "::set-output name=hash::$hash"
 
       - name: Cache ccache
         uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
           path: |
             ~/lede/.ccache
             ~/go
             ~/.npm
             ~/.cache
-          key: openwrt-build-cache
+          key: openwrt-build-cache-${{ steps.checkout.outputs.hash }}
+          restore-keys: |
+            openwrt-build-cache-
 
       - name: Update feeds and packages
         run: |
+          echo "UPDATE_CACHE=true" >> $GITHUB_ENV
           cd ~/lede
           if [ -d 'feeds' ]; then
             pushd feeds/packages; git restore .; popd
