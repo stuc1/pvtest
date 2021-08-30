@@ -73,8 +73,9 @@ sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon"' 
 #bring the ethinfo back
 cd package/emortal/autocore/files/x86
 cp ethinfo rpcd_10_system.js rpcd_21_ethinfo.js rpcd_luci rpcd_luci-mod-status.json ../arm
-sed -i '/arm\/cpuinfo/a\\t$(INSTALL_DATA) ./files/x86/rpcd_21_ethinfo.js $(1)/www/luci-static/resources/view/status/include/21_ethinfo.js' `find package/ -path '*/autocore/Makefile'`
 cd -
+sed -i '/arm\/cpuinfo/a\\t$(INSTALL_DATA) ./files/x86/rpcd_21_ethinfo.js $(1)/www/luci-static/resources/view/status/include/21_ethinfo.js' `find package/ -path '*/autocore/Makefile'`
+
 
 
 #remove the mirros from cn
