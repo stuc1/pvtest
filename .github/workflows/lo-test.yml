@@ -57,18 +57,6 @@ jobs:
           sudo chown $USER:$(id -gn) lede && git clone -b $BRANCH --single-branch https://github.com/immortalwrt/immortalwrt lede
           fi
 
-      - name: Cache ccache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            ~/lede/.ccache
-            ~/go
-            ~/.npm
-            ~/.cache
-          key: openwrt-build-cache
-
       - name: Update feeds and packages
         run: |
           cd ~/lede
@@ -192,7 +180,6 @@ jobs:
         if: env.TG
         run: |
           curl -k --data chat_id="${{secrets.TELEGRAM_CHAT_ID}}" --data "text=The ${{env.DEVICE}} build ran completed at ${{job.status}}." "https://api.telegram.org/bot${{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage"
-          if ! cat /proc/mounts | grep -q lede; then sudo mount -o loop lede.img lede/; fi
 
       - name: Debug via tmate
         uses: klever1988/ssh2actions@main
