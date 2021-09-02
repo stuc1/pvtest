@@ -59,6 +59,11 @@ jobs:
           sudo chown $USER:$(id -gn) lede && git clone -b $BRANCH --single-branch https://github.com/immortalwrt/immortalwrt lede
           fi
 
+      - uses: klever1988/cachewrtbuild@test
+        with:
+          ccache: 'true'
+          prefix: '/home/runner/lede'
+
       - name: Update feeds and packages
         run: |
           cd ~/lede
@@ -177,6 +182,8 @@ jobs:
           #  while true; do curl --data-binary @$f -H "$AUTH" -H 'Content-Type: application/octet-stream' "https://uploads.$cache_path/$cache_repo_id/assets?name=$f" && break || true; done
           #done
           ls *img.zst* ib-$DEVICE.tar.xz | parallel --wc 'while true; do curl -T {} -H "$AUTH" -H "Content-Type: application/octet-stream" "https://uploads.$cache_path/$cache_repo_id/assets?name={}" && break || true; done'
+
+          sudo mount -o loop lede.img lede/
 
       - name: Send tg notification
         if: env.TG
