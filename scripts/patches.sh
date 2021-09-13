@@ -18,10 +18,10 @@ sed -i '/skip\=/ a skip=`mount | grep -q /dev/$device; echo $?`' `find package/ 
 
 svn export https://github.com/klever1988/helloworld/trunk/luci-app-ssr-plus
 dir_ssrp=`find package/ -follow -type d -path '*/luci-app-ssr-plus'`
-cp luci-app-ssr-plus/root/etc/config/shadowsocksr ${dir_ssrp}/root/etc/config/shadowsocksr
 cp luci-app-ssr-plus/root/etc/ssrplus/black.list ${dir_ssrp}/root/etc/ssrplus/black.list
 cp luci-app-ssr-plus/root/etc/ssrplus/white.list ${dir_ssrp}/root/etc/ssrplus/white.list
 cp luci-app-ssr-plus/root/etc/ssrplus/blackipv6.sh ${dir_ssrp}/root/etc/ssrplus/blackipv6.sh
+cp luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh ${dir_ssrp}/root/etc/ssrplus/blackipv4.sh
 cp luci-app-ssr-plus/root/usr/bin/ssr-rules ${dir_ssrp}/root/usr/bin/ssr-rules
 rm -rf luci-app-ssr-plus/
 
@@ -29,6 +29,9 @@ mkdir -p `find package/ -follow -type d -path '*/pdnsd-alt'`/patches
 mv $GITHUB_WORKSPACE/patches/99-disallow-aaaa.patch `find package/ -follow -type d -path '*/pdnsd-alt'`/patches
 
 if [ $DEVICE != 'r1s' ]; then
+
+  # fix po path for snapshot
+  find package/ -follow -type d -path '*/po/zh-cn' | xargs dirname | xargs -n1 -i ln -s zh-cn {}/zh_Hans
 
   # remove non-exist package from x86 profile
   sed -i 's/kmod-i40evf//' target/linux/x86/Makefile
