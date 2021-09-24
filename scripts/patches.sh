@@ -4,8 +4,8 @@ sed -i "s/option sfe_flow '1'/option sfe_flow '0'/" $config_file_turboacc
 sed -i "s/option sfe_bridge '1'/option sfe_bridge '0'/" $config_file_turboacc
 sed -i "/dep.*INCLUDE_.*=n/d" `find package/ -follow -type f -path '*/luci-app-turboacc/Makefile'`
 
-sed -i "s/option limit_enable '1'/option limit_enable '0'/" `find package/ -follow -type f -path '*/vsftpd/files/vsftpd.uci'`
-sed -i "s/option enabled '1'/option enabled '0'/" `find package/ -follow -type f -path '*/nft-qos/files/nft-qos.config'`
+sed -i "s/option limit_enable '1'/option limit_enable '0'/" `find package/ -follow -type f -path '*/nft-qos/files/nft-qos.config'`
+sed -i "s/option enabled '1'/option enabled '0'/" `find package/ -follow -type f -path '*/vsftpd/files/vsftpd.uci'`
 sed -i "/\/etc\/coremark\.sh/d" `find package/ -follow -type f -path '*/coremark/coremark'`
 sed -i 's/192.168.1.1/192.168.2.1/' package/base-files/files/bin/config_generate
 sed -i 's/=1/=0/g' package/kernel/linux/files/sysctl-br-netfilter.conf
@@ -20,7 +20,7 @@ svn export https://github.com/klever1988/helloworld/trunk/luci-app-ssr-plus
 dir_ssrp=`find package/ -follow -type d -path '*/luci-app-ssr-plus'`
 cp luci-app-ssr-plus/root/etc/ssrplus/black.list ${dir_ssrp}/root/etc/ssrplus/black.list
 cp luci-app-ssr-plus/root/etc/ssrplus/white.list ${dir_ssrp}/root/etc/ssrplus/white.list
-cp luci-app-ssr-plus/root/etc/ssrplus/blackipv6.sh ${dir_ssrp}/root/etc/ssrplus/blackipv6.sh
+cp luci-app-ssr-plus/root/etc/ssrplus/blockipv6.sh ${dir_ssrp}/root/etc/ssrplus/blockipv6.sh
 cp luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh ${dir_ssrp}/root/etc/ssrplus/blackipv4.sh
 cp luci-app-ssr-plus/root/usr/bin/ssr-rules ${dir_ssrp}/root/usr/bin/ssr-rules
 rm -rf luci-app-ssr-plus/
@@ -66,27 +66,27 @@ if [ $DEVICE != 'r1s' ]; then
   sed -i '/arm\/cpuinfo/a\\t$(INSTALL_DIR) $(1)/www/luci-static/resources/view/status/include' $mf_autcore
   sed -i '/arm\/cpuinfo/a\\t$(INSTALL_BIN) ./files/x86/ethinfo $(1)/sbin/ethinfo' $mf_autcore
 
-  # inject the firmware version
-  strDate=`TZ=UTC-8 date +%Y-%m-%d`
-  status_pages=`find package/ -follow -type f \( -path '*/autocore/files/arm/index.htm' -o -path '*/autocore/files/x86/index.htm' -o -path '*/autocore/files/arm/rpcd_10_system.js' -o -path '*/autocore/files/x86/rpcd_10_system.js' \)`
-  for status_page in $status_pages; do
-  case $status_page in
-    *htm)
-      line_number_FV=`grep -n 'Firmware Version' $status_page | cut -d: -f 1`
-      sed -i '/ver\./d' $status_page
-      sed -i $line_number_FV' a <a href="https://github.com/klever1988/nanopi-openwrt" target="_blank">klever1988/nanopi-openwrt</a> '$strDate $status_page
-      ;;
-    *js)
-      line_number_FV=`grep -m1 -n 'corelink' $status_page | cut -d: -f1`
-      sed -i $line_number_FV' i var pfv = document.createElement('\''placeholder'\'');pfv.innerHTML = '\''<a href="https://github.com/klever1988/nanopi-openwrt" target="_blank">klever1988/nanopi-openwrt</a> '$strDate"';" $status_page
-      line_number_FV=`grep -n 'Firmware Version' $status_page | cut -d : -f 1`
-      sed -i '/Firmware Version/d' $status_page
-      sed -i $line_number_FV' a _('\''Firmware Version'\''), pfv,' $status_page
-      ;;
-  esac
-  done
-
 fi
+
+# inject the firmware version
+strDate=`TZ=UTC-8 date +%Y-%m-%d`
+status_pages=`find package/ -follow -type f \( -path '*/autocore/files/arm/index.htm' -o -path '*/autocore/files/x86/index.htm' -o -path '*/autocore/files/arm/rpcd_10_system.js' -o -path '*/autocore/files/x86/rpcd_10_system.js' \)`
+for status_page in $status_pages; do
+case $status_page in
+  *htm)
+    line_number_FV=`grep -n 'Firmware Version' $status_page | cut -d: -f 1`
+    sed -i '/ver\./d' $status_page
+    sed -i $line_number_FV' a <a href="https://github.com/klever1988/nanopi-openwrt" target="_blank">klever1988/nanopi-openwrt</a> '$strDate $status_page
+    ;;
+  *js)
+    line_number_FV=`grep -m1 -n 'corelink' $status_page | cut -d: -f1`
+    sed -i $line_number_FV' i var pfv = document.createElement('\''placeholder'\'');pfv.innerHTML = '\''<a href="https://github.com/klever1988/nanopi-openwrt" target="_blank">klever1988/nanopi-openwrt</a> '$strDate"';" $status_page
+    line_number_FV=`grep -n 'Firmware Version' $status_page | cut -d : -f 1`
+    sed -i '/Firmware Version/d' $status_page
+    sed -i $line_number_FV' a _('\''Firmware Version'\''), pfv,' $status_page
+    ;;
+esac
+done
 
 # little optimization argon css
 css_file=`find package/ -follow -type f -path '*/argon/css/cascade.css'`
