@@ -28,7 +28,7 @@ rm -rf luci-app-ssr-plus/
 mkdir -p `find package/ -follow -type d -path '*/pdnsd-alt'`/patches
 mv $GITHUB_WORKSPACE/patches/99-disallow-aaaa.patch `find package/ -follow -type d -path '*/pdnsd-alt'`/patches
 
-if [ $BRANCH != 'openwrt-18.06-k5.4' ]; then
+if [ $BRANCH == 'master' ]; then
 
   # fix po path for snapshot
   find package/ -follow -type d -path '*/po/zh-cn' | xargs dirname | xargs -n1 -i sh -c "rm -f {}/zh_Hans; ln -sf zh-cn {}/zh_Hans"
