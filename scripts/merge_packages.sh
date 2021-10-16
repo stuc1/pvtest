@@ -43,5 +43,4 @@ merge_package https://github.com/small-5/luci-app-adblock-plus
 merge_package https://github.com/zxlhhyccc/luci-app-v2raya
 merge_package https://github.com/messense/aliyundrive-webdav/trunk/openwrt/aliyundrive-webdav
 merge_package https://github.com/messense/aliyundrive-webdav/trunk/openwrt/luci-app-aliyundrive-webdav
-rm -f dl/*aliyundrive*
 drop_package luci-app-cd8021x
