@@ -24,7 +24,6 @@ sed -i 's/5.0/1.0/' .ccache/ccache.conf || true
 
 if [ $BRANCH == 'master' ]; then
 
-  sed -i '/LINUX_5_4/d' package/kernel/r8168/Makefile
   echo '# CONFIG_UCLAMP_TASK is not set' >> target/linux/sunxi/config-5.4
   sed -i '/LINUX_5_4/d' package/kernel/r8168/Makefile
 
