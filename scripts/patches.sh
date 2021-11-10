@@ -24,6 +24,7 @@ sed -i 's/5.0/1.0/' .ccache/ccache.conf || true
 
 if [ $BRANCH == 'master' ]; then
 
+  git checkout target/linux/rockchip
   sed -i 's/5.10/5.4/' target/linux/rockchip/Makefile
   git revert --no-commit 91eed5d9fb74e6c740291362ba12e11a2222a9fd
   
