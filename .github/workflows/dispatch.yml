@@ -24,7 +24,7 @@ on:
         required: true
       runner:
         description: 'runner to run'
-        default: 'ubuntu-18.04'
+        default: 'ubuntu-20.04'
         required: true
 
 jobs:

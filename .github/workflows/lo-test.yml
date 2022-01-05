@@ -86,7 +86,7 @@ jobs:
 
       - name: Custom configure file
         run: |
-          cd ~/lede
+          cd ~/lede && rm -rf .tmp/
           cat $GITHUB_WORKSPACE/$DEVICE.config.seed $GITHUB_WORKSPACE/common.seed | sed 's/\(CONFIG_PACKAGE_luci-app-[^A-Z]*=\)y/\1m/' > .config
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -n1 -i echo CONFIG_PACKAGE_{}=m >> .config
           cat $GITHUB_WORKSPACE/extra_packages.seed >> .config
@@ -121,6 +121,7 @@ jobs:
           cd ~/lede
           while true; do make download -j && break || true; done
           make -j$[`nproc`+1] IGNORE_ERRORS=1 | tee debug-build.log
+          if [ ! -e ~/lede/bin/targets/*/*/*imagebuilder*xz ]; then make V=sc; fi
           mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
 
           echo "======================="
