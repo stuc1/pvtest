@@ -4,7 +4,7 @@ on:
     inputs:
       branch:
         description: 'select code branch to build'
-        default: '18.06'
+        default: 'master'
         require: true
       device:
         description: 'select device to build'
