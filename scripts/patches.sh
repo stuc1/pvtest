@@ -82,7 +82,7 @@ sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon"' 
 sed -i '/182.140.223.146/d;/\.cn\//d;/tencent/d' scripts/download.pl
 
 # add r1s support to Lean's repo
-if [[ $DEVICE == 'r1s' ]; then
+if [[ $DEVICE == 'r1s' ]]; then
 cd ~ && git clone -b openwrt-21.02 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
   git log --grep r1s -i | grep '^commit ' | head -n -2 | cut -d' ' -f2 | tac | xargs git show | sed '0,/UENV/s//ATF/' > r1s.diff
   git show 124116564e8a6081e79cb2e87b0d87b2af99c583 >> r1s.diff
