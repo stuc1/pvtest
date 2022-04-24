@@ -88,6 +88,6 @@ cd ~ && git clone -b openwrt-21.02 https://github.com/immortalwrt/immortalwrt &&
   git show 124116564e8a6081e79cb2e87b0d87b2af99c583 >> r1s.diff
   cd ~/lede && chmod +x target/linux/sunxi/base-files/etc/board.d/* && git apply ~/immortalwrt/r1s.diff
   echo "\nCONFIG_ARM_ALLWINNER_SUN50I_CPUFREQ_NVMEM=y\nCONFIG_ARM_SCPI_CPUFREQ=y" >> target/linux/sunxi/cortexa53/config-5.4
-else [[ $DEVICE == 'r2s' -o $DEVICE == 'r2c' -o $DEVICE == 'r1p' -o $DEVICE == 'r1p-lts' ]]; then
+elif [[ $DEVICE == 'r2s' -o $DEVICE == 'r2c' -o $DEVICE == 'r1p' -o $DEVICE == 'r1p-lts' ]]; then
   sed -i 's/5.15/5.4/g' target/linux/rockchip/Makefile
 fi
