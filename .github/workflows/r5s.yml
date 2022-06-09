@@ -3,7 +3,7 @@ name: r5s-fuse-test
 on:
   workflow_dispatch:
   push:
-    branches: [ r5s-fuse ]
+    branches: [ r5s-fuse-test ]
 
 jobs:
 
