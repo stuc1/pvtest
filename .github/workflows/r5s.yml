@@ -1,8 +1,12 @@
 name: r5s-fuse-test
 
 on:
-
-  workflow_dispatch:
+  watch:
+    types: [started]
+  push:
+    branches: [ r5s-fuse ]
+  schedule:
+    - cron: '10 09 * * *'
 
 jobs:
 
