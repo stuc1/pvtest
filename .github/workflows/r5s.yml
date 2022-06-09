@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
         with:
-          ref: r5s-fuse
+          ref: r5s-fuse-test
 
       - name: Initialization Environment
         env:
