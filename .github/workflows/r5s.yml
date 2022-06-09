@@ -1,6 +1,7 @@
 name: r5s-fuse-test
 
 on:
+
   workflow_dispatch:
 
 jobs:
