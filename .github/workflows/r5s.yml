@@ -12,7 +12,6 @@ jobs:
   build:
 
     runs-on: self-hosted
-    if: github.repository == 'klever1988/nanopi-openwrt'
 
     steps:
 
