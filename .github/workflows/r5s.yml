@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [ r5s-fuse ]
-  schedule:
-    - cron: '10 09 * * *'
 
 jobs:
 
