@@ -4,7 +4,7 @@ on:
   watch:
     types: [started]
   push:
-    branches: [ r5s-fuse ]
+    branches: [ r5s-fuse-test ]
   schedule:
     - cron: '10 09 * * *'
 
