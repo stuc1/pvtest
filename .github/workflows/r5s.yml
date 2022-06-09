@@ -11,7 +11,7 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     if: github.repository == 'klever1988/nanopi-openwrt'
 
     steps:
@@ -37,10 +37,10 @@ jobs:
           #cat ../app_config.seed >> ../base_rk3328.seed
           #cat ../base_rk3328.seed > configs/config_rk3328
           cd friendlywrt
-          git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
-          git checkout upstream/master -b tmp
-          git checkout master-v22.03
-          git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp -X theirs
+          ##git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
+          ##git checkout upstream/master -b tmp
+          ##git checkout master-v22.03
+          ##git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp -X theirs
           #. ../../3_prepare_packages.sh
           . ../../5_mods.sh
 
