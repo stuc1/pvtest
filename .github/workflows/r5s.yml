@@ -12,7 +12,7 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-1804
+    runs-on: ubuntu-18.04
 
     steps:
 
