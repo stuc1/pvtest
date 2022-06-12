@@ -7,4 +7,4 @@ repo sync -c --no-tags --no-clone-bundle -j8
 cd friendlywrt/ && git fetch --unshallow
 git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
 
-cd ../ && find device/ -name distfeeds.conf -delete
+#cd ../ && find device/ -name distfeeds.conf -delete
