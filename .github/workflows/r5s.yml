@@ -37,14 +37,14 @@ jobs:
           #cat ../app_config.seed >> ../base_rk3328.seed
           #cat ../base_rk3328.seed > configs/config_rk3328
           cd friendlywrt
-          git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
-          git checkout upstream/master -b tmp
-          git checkout 12673022490bfe7a25c92ff0bd1db72f4b01de92 -- target/linux/rockchip/armv8/base-files/root/setup.sh
-          git add . && git commit -m 'prepare'
-          git checkout master-v22.03
-          git rebase db3d7e8fd3a85afbcc7dd945f86950ab735c7e81^ --onto tmp -X theirs
-          #. ../../3_prepare_packages.sh
-          . ../../5_mods.sh
+          #git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
+          #git checkout upstream/master -b tmp
+          #git checkout 12673022490bfe7a25c92ff0bd1db72f4b01de92 -- target/linux/rockchip/armv8/base-files/root/setup.sh
+          #git add . && git commit -m 'prepare'
+          #git checkout master-v22.03
+          #git rebase db3d7e8fd3a85afbcc7dd945f86950ab735c7e81^ --onto tmp -X theirs
+          ##. ../../3_prepare_packages.sh
+          #. ../../5_mods.sh
 
       - name: Build FriendlyWrt
         run: . 4_build_image.sh friendlywrt-rk3568 nanopi_r5s.mk
