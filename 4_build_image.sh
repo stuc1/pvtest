@@ -2,7 +2,7 @@ cd $1
 cd friendlywrt
 cd ..
 
-sed -i '/feeds/d' scripts/mk-friendlywrt.sh
+#sed -i '/feeds/d' scripts/mk-friendlywrt.sh
 ./build.sh $2
 
 LOOP_DEVICE=$(losetup -f)
