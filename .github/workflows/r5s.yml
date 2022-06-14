@@ -37,12 +37,12 @@ jobs:
           ##cat ../app_config.seed >> ../base_rk3328.seed
           ##cat ../base_rk3328.seed > configs/config_rk3328
           cd friendlywrt
-          #git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
-          #git checkout upstream/master -b tmp
-          #git checkout 12673022490bfe7a25c92ff0bd1db72f4b01de92 -- target/linux/rockchip/armv8/base-files/root/setup.sh
-          #git add . && git commit -m 'prepare'
-          #git checkout master-v22.03
-          #git rebase db3d7e8fd3a85afbcc7dd945f86950ab735c7e81^ --onto tmp -X theirs
+          git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
+          rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
+          git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
+          git add . && git commit -am prepare
+          git checkout master-v22.03
+          git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
           ##. ../../3_prepare_packages.sh
           #. ../../5_mods.sh
 
