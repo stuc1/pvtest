@@ -38,6 +38,7 @@ jobs:
           ##cat ../base_rk3328.seed > configs/config_rk3328
           cd friendlywrt
           git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
+          git checkout upstream/master -b tmp
           rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
           git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
           git add . && git commit -am prepare
