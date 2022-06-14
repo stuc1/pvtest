@@ -44,7 +44,7 @@ jobs:
           git add . && git commit -am prepare
           git checkout master-v22.03
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
-          git revert 5a04bf86986253db08d0005c6c21960ebb2cfb04 --no-edit
+          git revert `git log package/network/utils/umbim | head -1 | awk '{print $2}'` --no-edit
           ##. ../../3_prepare_packages.sh
           #. ../../5_mods.sh
 
