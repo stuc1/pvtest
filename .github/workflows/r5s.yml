@@ -32,7 +32,7 @@ jobs:
       - name: Mods
         run: |
           cd friendlywrt-rk3568
-          #. ../remove_unused_config.sh
+          . ../remove_unused_config.sh
           ##cat configs/config_rk3328 | grep "TARGET" >> ../base_rk3328.seed
           ##cat ../app_config.seed >> ../base_rk3328.seed
           ##cat ../base_rk3328.seed > configs/config_rk3328
@@ -44,6 +44,7 @@ jobs:
           git add . && git commit -am prepare
           git checkout master-v22.03
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
+          git revert 5a04bf86986253db08d0005c6c21960ebb2cfb04 --no-edit
           ##. ../../3_prepare_packages.sh
           #. ../../5_mods.sh
 
