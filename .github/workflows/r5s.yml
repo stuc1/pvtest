@@ -41,6 +41,10 @@ jobs:
           git checkout upstream/master -b tmp
           rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
           git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
+          line_number_CONFIG_CRYPTO_LIB_BLAKE2S=$[`grep -n 'CONFIG_CRYPTO_LIB_BLAKE2S' package/kernel/linux/modules/crypto.mk | cut -d: -f 1`+1]
+          sed -i $line_number_CONFIG_CRYPTO_LIB_BLAKE2S' s/HIDDEN:=1/DEPENDS:=@(LINUX_5_4||LINUX_5_10)/' package/kernel/linux/modules/crypto.mk
+          sed -i 's/libblake2s.ko@lt5.9/libblake2s.ko/;s/libblake2s-generic.ko@lt5.9/libblake2s-generic.ko/' package/kernel/linux/modules/crypto.mk
+          #echo 'kmod-wireguard' >> `ls staging_dir/target-*/pkginfo/linux.default.install`
           git add . && git commit -am prepare
           git checkout master-v22.03
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
