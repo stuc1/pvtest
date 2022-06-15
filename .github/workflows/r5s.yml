@@ -41,6 +41,7 @@ jobs:
           rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
           git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
           git add . && git commit -m prepare
+          git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
 
       - name: mods
