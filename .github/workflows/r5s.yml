@@ -36,12 +36,11 @@ jobs:
           repo sync -c --no-tags --no-clone-bundle -j8
           cd friendlywrt
           git fetch --unshallow
-          git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
           git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
           git checkout upstream/master -b tmp
           rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
           git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
-          git add . && git commit -am prepare
+          git add . && git commit -m prepare
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
 
       - name: mods
