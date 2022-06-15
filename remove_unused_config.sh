@@ -1,2 +1,3 @@
-sed -i '/=m/d;/CONFIG_VERSION/d;/CONFIG_IB/d;/CONFIG_SDK/d;/CONFIG_BUILDBOT/d;/CONFIG_ALL_KMODS/d;/CONFIG_ALL_NONSHARED/d;/CONFIG_DISPLAY_SUPPORT/d;/CONFIG_AUDIO_SUPPORT/d;/CONFIG_AUTOREBUILD/d;/CONFIG_AUTOREMOVE/d;/CONFIG_MAKE_TOOLCHAIN/d;/CGROUPS/d;/PACKAGE_lib/d;/luci-lib/d;/luci-app/d;/LLVM/d;/vsftpd=/d;/docker/Id;' `find configs/ -type f`
+sed -i '/=m/d;/CONFIG_VERSION/d;/CONFIG_IB/d;/CONFIG_SDK/d;/CONFIG_BUILDBOT/d;/CONFIG_ALL_KMODS/d;/CONFIG_ALL_NONSHARED/d;/CONFIG_DISPLAY_SUPPORT/d;/CONFIG_AUDIO_SUPPORT/d;/CONFIG_AUTOREBUILD/d;/CONFIG_AUTOREMOVE/d;/CONFIG_MAKE_TOOLCHAIN/d;/CGROUPS/d;/PACKAGE_lib/d;/luci-lib/d;/luci-app/d;/LLVM/d;/vsftpd=/d;/docker/Id;' `find configs/ -type f` scripts/mk-friendlywrt.sh
+
 ls configs/* | xargs -i echo -e '\nCONFIG_KERNEL_BUILD_USER="Dayong Chen"\nCONFIG_GRUB_TITLE="OpenWrt on Nanopi devices compiled by DayongChen"' >> configs/{}
