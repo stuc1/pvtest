@@ -1,0 +1,76 @@
+name: build r5s firmware
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    timeout-minutes: 1440
+    runs-on: ubuntu-18.04
+    env:
+      TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      DEVICE: r5s
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: initialization
+        run: |
+          apt install -y hwinfo && sudo hwinfo --short
+          git config --global user.email "action@github.com" && git config --global user.name "GitHub Action"
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
+          wget -O - https://raw.githubusercontent.com/friendlyarm/build-env-on-ubuntu-bionic/master/install.sh  | sed '/#/d;/os-release/d;/UBUNTU_CODENAME/d' | sed 's/\\//g;s/exit 0//g;s/sudo apt -y install//g;s/sudo apt-get -y install//g;s/:i386//g' | xargs sudo apt-get -y --no-install-recommends install android-tools-fsutils python-networkx
+          docker images -q | xargs -ri docker rmi {}
+          git clone https://github.com/friendlyarm/repo
+          sudo cp repo/repo /usr/bin/
+
+      - name: init sources
+        run: |
+          mkdir friendlywrt-rk3568 && cd friendlywrt-rk3568
+          repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v22.03 -m rk3568.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle --depth=1
+          repo sync -c --no-tags --no-clone-bundle -j8
+          cd friendlywrt
+          git fetch --unshallow
+          git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
+          git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
+          git checkout upstream/master -b tmp
+          rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
+          git checkout f0e0bcba5edc6db768f7942fbb7105889ea6b00a -- package/boot/uboot-rockchip/ target/linux/rockchip/ package/base-files/files/etc/shadow package/kernel/mac80211/files/lib/wifi/mac80211.sh
+          git add . && git commit -am prepare
+          git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
+
+      - name: mods
+        run: |
+          cd friendlywrt-rk3568
+          sed -i '/=m/d;/CONFIG_VERSION/d;/CONFIG_IB/d;/CONFIG_SDK/d;/CONFIG_BUILDBOT/d;/CONFIG_ALL_KMODS/d;/CONFIG_ALL_NONSHARED/d;/CONFIG_DISPLAY_SUPPORT/d;/CONFIG_AUDIO_SUPPORT/d;/CONFIG_AUTOREBUILD/d;/CONFIG_AUTOREMOVE/d;/CONFIG_MAKE_TOOLCHAIN/d;/CGROUPS/d;/PACKAGE_lib/d;/luci-lib/d;/luci-app/d;/LLVM/d;/vsftpd=/d;/docker/Id;' `find configs/ -type f` scripts/mk-friendlywrt.sh
+          cd friendlywrt
+          . $GITHUB_WORKSPACE/scripts/merge_packages.sh
+
+      - name: compile
+        run: |
+          cd friendlywrt-rk3568
+          ./build.sh rk3568.mk
+
+      - name: prepare relase
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/release
+          mv $(ls -1 friendlywrt-rk3568/out/*img.gz | head -1) $GITHUB_WORKSPACE/release/$DEVICE.img.gz
+          cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE.img.gz > $DEVICE.img.gz.md5
+          gzip -dc $DEVICE.img.gz | md5sum | sed "s/-/$DEVICE.img/" > $DEVICE.img.md5
+          echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
+          echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
+
+      - name: create release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./release/*
+          tag: ${{env.strDate}}
+          file_glob: true
+          overwrite: true
+          release_name: ${{env.strDate}} 自动发布
