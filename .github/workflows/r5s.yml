@@ -20,7 +20,7 @@ jobs:
 
       - name: initialization
         run: |
-          apt install -y hwinfo && sudo hwinfo --short
+          sudo apt install -y hwinfo && sudo hwinfo --short
           git config --global user.email "action@github.com" && git config --global user.name "GitHub Action"
           sudo apt-get update
           sudo apt-get -y --no-install-recommends install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
@@ -43,6 +43,11 @@ jobs:
           git add . && git commit -m prepare
           git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
+
+      - name: fix
+        run: |
+          cd friendlywrt-rk3568/friendlywrt
+          git revert `git log package/network/utils/umbim | head -1 | awk '{print $2}'` --no-edit
 
       - name: mods
         run: |
