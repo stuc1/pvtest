@@ -53,7 +53,7 @@ jobs:
         run: |
           cd friendlywrt-rk3568
           sed -i '/=m/d;/CONFIG_VERSION/d;/CONFIG_IB/d;/CONFIG_SDK/d;/CONFIG_BUILDBOT/d;/CONFIG_ALL_KMODS/d;/CONFIG_ALL_NONSHARED/d;/CONFIG_DISPLAY_SUPPORT/d;/CONFIG_AUDIO_SUPPORT/d;/CONFIG_AUTOREBUILD/d;/CONFIG_AUTOREMOVE/d;/CONFIG_MAKE_TOOLCHAIN/d;/CGROUPS/d;/PACKAGE_lib/d;/luci-lib/d;/luci-app/d;/LLVM/d;/vsftpd=/d;/docker/Id;' `find configs/ -type f` scripts/mk-friendlywrt.sh
-          cat $GITHUB_WORKSPACE/$DEVICE.config.seed $GITHUB_WORKSPACE/common.seed > configs/05-others
+          cat $GITHUB_WORKSPACE/r2s.config.seed $GITHUB_WORKSPACE/common.seed > configs/05-others
           cd friendlywrt
           . $GITHUB_WORKSPACE/scripts/merge_packages.sh
 
