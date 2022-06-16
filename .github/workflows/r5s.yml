@@ -7,7 +7,7 @@ jobs:
 
   build:
     timeout-minutes: 1440
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     env:
       TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       DEVICE: r5s
