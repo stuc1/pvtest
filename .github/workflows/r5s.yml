@@ -15,7 +15,7 @@ jobs:
 
   build:
     timeout-minutes: 1440
-    runs-on: ${{ github.event.inputs.message }}
+    runs-on: ${{ github.event.inputs.runner }}
     env:
       TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       DEVICE: r5s
