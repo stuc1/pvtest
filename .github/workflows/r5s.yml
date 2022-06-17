@@ -5,12 +5,10 @@ on:
     inputs:
       runner:
         type: choice
-        description: Who to greet
+        description: where to run
         options: 
         - self-hosted
         - ubuntu-18.04
-      environment:
-        type: environment
 
 
 jobs:
