@@ -70,16 +70,27 @@ jobs:
         run: |
           cd friendlywrt-rk3568
           ./build.sh rk3568.mk
+          cd friendlywrt
+          make target/imagebuilder/compile
 
       - name: prepare relase
         run: |
+          sed -i 's/bin\/targets\/rockchip\/armv8\/packages/ib\/packages/' friendlywrt-rk3568/device/friendlyelec/rk3568/base.mk
+          cd friendlywrt-rk3568/friendlywrt
+          mv bin/targets/*/*/*imagebuilder*xz ib.tar.xz
+          tar xf ib.tar.xz --wildcards */packages
+          mv openwrt-imagebuilder* ib
+          cd ..
+          ./build.sh sd-img
+          cd ..
+
           mkdir -p $GITHUB_WORKSPACE/release
           mv $(ls -1 friendlywrt-rk3568/out/*img.gz | head -1) $GITHUB_WORKSPACE/release/$DEVICE.img.gz
           cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE.img.gz > $DEVICE.img.gz.md5
           gzip -dc $DEVICE.img.gz | md5sum | sed "s/-/$DEVICE.img/" > $DEVICE.img.md5
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
-          mv friendlywrt-rk3568/friendlywrt/bin/targets/*/*/*imagebuilder*xz release/
+          
 
       - name: create release
         uses: svenstaro/upload-release-action@v2
