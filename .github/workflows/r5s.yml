@@ -2,12 +2,22 @@ name: build r5s firmware
 
 on:
   workflow_dispatch:
+    inputs:
+      runner:
+        type: choice
+        description: Who to greet
+        options: 
+        - self-hosted
+        - ubuntu-18.04
+      environment:
+        type: environment
+
 
 jobs:
 
   build:
     timeout-minutes: 1440
-    runs-on: self-hosted
+    runs-on: ${{ github.event.inputs.message }}
     env:
       TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       DEVICE: r5s
