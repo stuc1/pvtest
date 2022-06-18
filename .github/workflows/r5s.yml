@@ -56,6 +56,7 @@ jobs:
         run: |
           cd friendlywrt-rk3568/friendlywrt
           git revert `git log package/network/utils/umbim | head -1 | awk '{print $2}'` --no-edit
+          git revert `git log tools/automake | head -1 | awk '{print $2}'` --no-edit
           git rm -r package/utils/usbmode
 
       - name: mods
