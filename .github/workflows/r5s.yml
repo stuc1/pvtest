@@ -70,7 +70,7 @@ jobs:
       - name: compile
         run: |
           cd friendlywrt-rk3568
-          ./build.sh rk3568.mk
+          ./build.sh nanopi_r5s.mk
           cd friendlywrt
           make target/imagebuilder/compile
 
