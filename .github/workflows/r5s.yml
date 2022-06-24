@@ -125,8 +125,8 @@ jobs:
           sed -i 's/bin\/targets\/rockchip\/armv8\/packages/ib\/packages/' friendlywrt-rk3568/device/friendlyelec/rk3568/base.mk
           cd friendlywrt-rk3568/friendlywrt
           mv bin/targets/*/*/*imagebuilder*xz ib.tar.xz
-          tar xf ib.tar.xz --wildcards \*/packages
-          mv openwrt-imagebuilder* ib
+          tar xf ib.tar.xz && mv *imagebuilder* ib
+          cd ib && make image && cd -
           cd ..
           ./build.sh sd-img
           cd ..
