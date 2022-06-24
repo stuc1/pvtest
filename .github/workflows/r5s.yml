@@ -52,6 +52,7 @@ jobs:
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
           cd -
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
+          sudo chown -R $USER:$(id -gn) lede
 
       - name: init sources
         run: |
