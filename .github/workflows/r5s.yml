@@ -37,9 +37,25 @@ jobs:
           git clone https://github.com/friendlyarm/repo
           sudo cp repo/repo /usr/bin/
 
+      - name: checkout out cache
+        run: |
+          cd
+          curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
+          sudo umount lede || true
+          sudo fdisk -l | grep loop | grep '30 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
+          rm -r lede* luci packages || true
+          for i in {1..20}
+          do
+            curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
+          done | zstdmt -d -o lede.img || (truncate -s 33g lede.img && mkfs.btrfs -M lede.img)
+          LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
+          sudo losetup -P --direct-io $LOOP_DEVICE lede.img
+          mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
+
       - name: init sources
         run: |
-          mkdir friendlywrt-rk3568 && cd friendlywrt-rk3568
+          mount --bind lede friendlywrt-rk3568
+          cd friendlywrt-rk3568
           repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v22.03 -m rk3568.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle --depth=1
           repo sync -c --no-tags --no-clone-bundle -j8
           cd friendlywrt
@@ -76,6 +92,34 @@ jobs:
           cd friendlywrt
           make target/imagebuilder/compile
 
+      - name: Save cache state
+        run: |
+          cd
+          sleep 60
+          sudo mount -o remount,compress=no,nodatacow,nodatasum lede
+          cd lede/; pv /dev/zero > zerospace || true; sync; rm -f zerospace; cd -
+          sleep 60
+          sudo umount friendlywrt-rk3568
+          sudo umount lede
+          sudo losetup -d $LOOP_DEVICE
+          export AUTH="Authorization: token ${{ secrets.SEC_TOKEN }}"
+          export cache_path='github.com/repos/klever1988/sshactions/releases'
+          export cache_repo_id='39020554'
+          zstdmt -c --long lede.img | split --numeric=1 -b 2000m - lede.$DEVICE.img.zst.
+          while true; do
+          ret=$(curl -sH "$AUTH" "https://api.$cache_path/tags/cache")
+          echo $ret | jq -r '.assets[] | select(.name | contains ("'$DEVICE'.img")).id' | \
+          xargs -n1 -i curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
+          echo $ret | jq -r '.assets[] | select(.name == "ib-'$DEVICE'.tar.xz").id' | \
+          xargs -n1 -i curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
+          ls *img.zst* ib-$DEVICE.tar.xz | parallel --wc 'while true; do curl -T {} -H "$AUTH" -H "Content-Type: application/octet-stream" "https://uploads.$cache_path/$cache_repo_id/assets?name={}" && break || true; done'
+          set +e
+          for i in {1..20}; do curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break; done | zstdmt -d -o /dev/null
+          if [ $? -eq 0 ]; then break; fi
+          done
+
+          sudo mount -o loop lede.img friendlywrt-rk3568
+
       - name: prepare relase
         run: |
           sed -i 's/bin\/targets\/rockchip\/armv8\/packages/ib\/packages/' friendlywrt-rk3568/device/friendlyelec/rk3568/base.mk
@@ -93,7 +137,6 @@ jobs:
           gzip -dc $DEVICE.img.gz | md5sum | sed "s/-/$DEVICE.img/" > $DEVICE.img.md5
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
-          
 
       - name: create release
         uses: svenstaro/upload-release-action@v2
