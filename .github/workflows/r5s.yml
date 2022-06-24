@@ -47,9 +47,10 @@ jobs:
           for i in {1..20}
           do
             curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 33g lede.img && mkfs.btrfs -M lede.img)
+          done | zstdmt -d -o lede.img || (truncate -s 55g lede.img && mkfs.btrfs -M lede.img)
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
+          cd -
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
 
       - name: init sources
@@ -94,7 +95,6 @@ jobs:
 
       - name: Save cache state
         run: |
-          cd
           sleep 60
           sudo mount -o remount,compress=no,nodatacow,nodatasum lede
           cd lede/; pv /dev/zero > zerospace || true; sync; rm -f zerospace; cd -
@@ -105,7 +105,7 @@ jobs:
           export AUTH="Authorization: token ${{ secrets.SEC_TOKEN }}"
           export cache_path='github.com/repos/klever1988/sshactions/releases'
           export cache_repo_id='39020554'
-          zstdmt -c --long lede.img | split --numeric=1 -b 2000m - lede.$DEVICE.img.zst.
+          zstdmt -c --long ~/lede.img | split --numeric=1 -b 2000m - lede.$DEVICE.img.zst.
           while true; do
           ret=$(curl -sH "$AUTH" "https://api.$cache_path/tags/cache")
           echo $ret | jq -r '.assets[] | select(.name | contains ("'$DEVICE'.img")).id' | \
@@ -118,7 +118,7 @@ jobs:
           if [ $? -eq 0 ]; then break; fi
           done
 
-          sudo mount -o loop lede.img friendlywrt-rk3568
+          sudo mount -o loop ~/lede.img friendlywrt-rk3568
 
       - name: prepare relase
         run: |
