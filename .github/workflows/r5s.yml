@@ -100,7 +100,7 @@ jobs:
       - name: compile
         run: |
           cd friendlywrt-rk3568
-          ./build.sh nanopi_r5s.mk
+          ./build.sh nanopi_r5s.mk || (cd friendlywrt && make V=sc)
           cd friendlywrt
           make target/imagebuilder/compile
 
