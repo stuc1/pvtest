@@ -69,7 +69,7 @@ jobs:
           cd -
           repo sync -c --no-tags --no-clone-bundle -j8
           cd friendlywrt
-          git fetch --unshallow
+          git fetch --unshallow || true
           git remote add upstream https://github.com/coolsnowwolf/lede && git fetch upstream
           git checkout upstream/master -b tmp
           rm -r package/boot/uboot-rockchip/ target/linux/rockchip/
