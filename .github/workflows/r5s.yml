@@ -61,10 +61,10 @@ jobs:
           repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v22.03 -m rk3568.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle --depth=1
           cd friendlywrt
           if [ -d .git ]; then
-            git reset --hard `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
+            git reset --hard origin/`git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
             git clean -f -d
             git branch -D tmp master
-            git remote remote upstream
+            git remote remove upstream
           fi
           cd -
           repo sync -c --no-tags --no-clone-bundle -j8
