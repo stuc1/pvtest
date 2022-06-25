@@ -92,6 +92,7 @@ jobs:
           cat $GITHUB_WORKSPACE/r2s.config.seed $GITHUB_WORKSPACE/common.seed $GITHUB_WORKSPACE/extra_packages.seed | sed '/CONFIG_PACKAGE_kmod/d' > configs/rockchip/05-others
           echo 'CONFIG_TARGET_ROOTFS_PARTSIZE=800' >> configs/rockchip/05-others
           echo 'CONFIG_PACKAGE_mtd=y' >> configs/rockchip/05-others
+          sed -i '/find/d' scripts/mk-friendlywrt.sh
           sed -i 's/RAW_SIZE_MB=1000/RAW_SIZE_MB=2000/' scripts/sd-fuse/mk-sd-image.sh
           cd friendlywrt
           . $GITHUB_WORKSPACE/scripts/merge_packages.sh
