@@ -65,8 +65,8 @@ jobs:
             git clean -f -d
             git branch -D tmp
             git remote remove upstream
+            cd -
           fi
-          cd -
           repo sync -c --no-tags --no-clone-bundle -j8
           cd friendlywrt
           git fetch --unshallow || true
