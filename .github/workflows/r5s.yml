@@ -59,8 +59,8 @@ jobs:
           mkdir friendlywrt-rk3568 && sudo mount --bind lede friendlywrt-rk3568
           cd friendlywrt-rk3568
           repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v22.03 -m rk3568.xml --repo-url=https://github.com/friendlyarm/repo  --no-clone-bundle --depth=1
-          cd friendlywrt
-          if [ -d .git ]; then
+          if [ -d friendlywrt/.git ]; then
+            cd friendlywrt
             git reset --hard origin/`git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
             git clean -f -d
             git branch -D tmp
