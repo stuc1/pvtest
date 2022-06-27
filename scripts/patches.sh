@@ -56,12 +56,8 @@ if [[ $BRANCH == 'master' ]]; then
   #sed -i 's/r8169/r8168/' target/linux/rockchip/image/armv8.mk
 
 
-<<<<<<< HEAD
-  if [[ $DEVICE == 'r2s' -o $DEVICE == 'r2c' -o $DEVICE == 'r1p' ]]; then
-=======
   case $DEVICE in
   (r2s|r2c|r1p)
->>>>>>> master
     # change the voltage value for over-clock stablization
     config_file_cpufreq=`find package/ -follow -type f -path '*/luci-app-cpufreq/root/etc/config/cpufreq'`
     truncate -s-1 $config_file_cpufreq
@@ -74,11 +70,7 @@ if [[ $BRANCH == 'master' ]]; then
     git apply cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
     rm cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
     sed -i 's/pwmchip1/pwmchip0/' target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol.sh target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol-direct.sh
-<<<<<<< HEAD
-  fi
-=======
   esac
->>>>>>> master
 
 fi
 
