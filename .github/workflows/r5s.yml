@@ -7,8 +7,8 @@ on:
         type: choice
         description: where to run
         options: 
-        - self-hosted
         - ubuntu-18.04
+        - self-hosted
 
 
 jobs:
