@@ -11,20 +11,35 @@ on:
         default: 'r2s'
         required: true
       debug:
+        type: choice
         description: 'debug?'
+        options: 
+        - true
+        - false
         default: 'true'
         required: true
       cache_save:
+        type: choice
         description: 'check to save cache'
+        options: 
+        - true
+        - false
         default: 'false'
         required: true
       package_clean:
+        type: choice
         description: 'check to make clean package'
-        default: 'false'
+        options: 
+        - true
+        - false
+        default: 'true'
         required: true
       runner:
-        description: 'runner to run'
-        default: 'ubuntu-20.04'
+        type: choice
+        description: Where to run
+        options: 
+        - ubuntu-20.04
+        - self-hosted
         required: true
 
 jobs:
