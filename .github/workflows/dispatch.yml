@@ -32,7 +32,7 @@ on:
         options: 
         - true
         - false
-        default: 'true'
+        default: 'false'
         required: true
       runner:
         type: choice
