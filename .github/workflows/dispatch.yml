@@ -24,7 +24,7 @@ on:
         options:
         - true
         - false
-        default: 'false'
+        default: 'true'
         required: true
       package_clean:
         type: choice
