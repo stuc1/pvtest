@@ -169,6 +169,7 @@ jobs:
           cd
           sleep 60
           sudo mount -o remount,compress=no,nodatacow,nodatasum lede
+          sudo chown -R $USER:116 lede
           cd lede/; pv /dev/zero > zerospace || true; sync; rm -f zerospace; cd -
           sleep 60
           sudo umount lede
