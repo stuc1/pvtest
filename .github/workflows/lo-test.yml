@@ -54,7 +54,7 @@ jobs:
           cd
           curl -sL https://raw.githubusercontent.com/stupidloud/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
           sudo umount lede || true
-          sudo fdisk -l | grep loop | grep '33 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
+          sudo fdisk -l | grep loop | grep '30 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
           rm -r lede* luci packages || true
           for i in {1..20}
           do
