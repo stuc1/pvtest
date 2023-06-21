@@ -16,7 +16,7 @@ on:
         options:
         - true
         - false
-        default: 'true'
+        default: 'false'
         required: true
       cache_save:
         type: choice
