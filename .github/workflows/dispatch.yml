@@ -38,7 +38,7 @@ on:
         type: choice
         description: Where to run
         options:
-        - ubuntu-20.04
+        - ubuntu-latest
         - self-hosted
         required: true
 
