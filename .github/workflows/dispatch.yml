@@ -5,7 +5,7 @@ on:
       branch:
         description: 'select code branch to build'
         default: 'master'
-        require: true
+        required: true
       device:
         description: 'select device to build'
         default: 'r2s'
