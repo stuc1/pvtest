@@ -12,6 +12,9 @@ on:
         description: 'seleclt openwrt branch'
         default: 'master'
         required: false
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
 
