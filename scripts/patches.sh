@@ -117,6 +117,8 @@ if [[ $DEVICE == 'r1s' ]]; then
   merge_package https://github.com/immortalwrt/immortalwrt/branches/openwrt-18.06-k5.4/package/emortal/autocore
 
   sed -i '/luci/d' $GITHUB_WORKSPACE/extra_packages.seed
+
+  sed -i 's/5.10/5.4/g' target/linux/sunxi/Makefile
 fi
 
 # fix for r1s-h3
