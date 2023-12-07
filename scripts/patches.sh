@@ -98,6 +98,7 @@ esac
 if [[ $DEVICE == 'r6s' || $DEVICE == 'r6c' ]]; then
   pip3 install pylibfdt
   cd ~ && rm -rf immortalwrt/ && git clone -b master --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
+  mv include/kernel-6.1 ~/lede/include/
   rsync -a --delete target/linux/rockchip/. ~/lede/target/linux/rockchip/. && rsync -a --delete target/linux/generic/. ~/lede/target/linux/generic/. && rsync -a --delete package/boot/. ~/lede/package/boot/.
   cd ~/lede
   wget https://github.com/coolsnowwolf/lede/raw/master/target/linux/generic/hack-6.1/952-add-net-conntrack-events-support-multiple-registrant.patch
@@ -117,7 +118,7 @@ if [[ $DEVICE == 'r1s' ]]; then
   cd ~/lede
   sed -i 's/kmod-rtl8189es//;s/wpad-basic-openssl/wpad-basic-wolfssl/' target/linux/sunxi/image/cortexa53.mk
   git diff
-  merge_package https://github.com/immortalwrt/immortalwrt/branches/openwrt-18.06-k5.4/package/emortal/autocore
+  merge_package "-b openwrt-18.06-k5.4 https://github.com/immortalwrt/immortalwrt" immortalwrt/package/emortal/autocore
 
   sed -i '/luci/d' $GITHUB_WORKSPACE/common.seed $GITHUB_WORKSPACE/extra_packages.seed
 fi
