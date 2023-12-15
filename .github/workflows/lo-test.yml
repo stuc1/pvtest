@@ -203,7 +203,7 @@ jobs:
           done
           set -e
 
-          sudo mount -o loop lede.img lede/
+          sudo mount -o loop /mnt/lede.img lede/
 
       - name: Send tg notification
         if: env.TG
