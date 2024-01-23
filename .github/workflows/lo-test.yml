@@ -14,7 +14,7 @@ on:
         required: false
 concurrency:
   group: ${{ github.event.client_payload.device }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
 
