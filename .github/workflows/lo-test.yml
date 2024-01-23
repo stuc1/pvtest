@@ -12,9 +12,9 @@ on:
         description: 'seleclt openwrt branch'
         default: 'master'
         required: false
-concurrency:
-  group: ${{ github.event.client_payload.device }}
-  cancel-in-progress: false
+#concurrency:
+  #group: ${{ github.event.client_payload.device }}
+  #cancel-in-progress: false
 
 jobs:
 
