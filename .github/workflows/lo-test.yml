@@ -70,7 +70,7 @@ jobs:
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
           if [ -d 'lede/.git' ]; then
           cd lede && rm -f zerospace && git config --local user.email "action@github.com" && git config --local user.name "GitHub Action"
-          git fetch && git reset --hard a5a63865ff925404c65ec54287deca1491ab91d1 && git clean -df
+          git fetch && git reset --hard b055b3b409852a9580f740fde6c9e2d6480e3b8e && git clean -df
           else
           sudo chown $USER:$(id -gn) lede && git clone -b $BRANCH --single-branch https://github.com/coolsnowwolf/lede lede
           fi
