@@ -18,6 +18,14 @@ on:
         - false
         default: 'false'
         required: true
+      expand:
+        type: choice
+        description: 'expand?'
+        options:
+        - true
+        - false
+        default: 'false'
+        required: true
       cache_save:
         type: choice
         description: 'check to save cache'
