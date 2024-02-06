@@ -116,7 +116,7 @@ if [[ $DEVICE == 'r1s' ]]; then
   cd ~ && rm -rf immortalwrt/ && git clone -b openwrt-18.06-k5.4 --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
   rsync -a --delete target/linux/sunxi/. ~/lede/target/linux/sunxi/. && rsync -a --delete package/boot/. ~/lede/package/boot/.
   cd ~/lede
-  sed -i 's/kmod-rtl8189es//' target/linux/sunxi/image/cortexa53.mk
+  sed -i 's/kmod-rtl8189es//;s/wpad-basic-openssl/wpad-basic-wolfssl/' target/linux/sunxi/image/cortexa53.mk
   git diff --summary
   merge_package "-b openwrt-18.06-k5.4 https://github.com/immortalwrt/immortalwrt" immortalwrt/package/emortal/autocore
 
