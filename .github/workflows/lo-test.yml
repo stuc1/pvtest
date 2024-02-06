@@ -100,7 +100,7 @@ jobs:
           make defconfig && sed -i -E 's/# (CONFIG_.*_COMPRESS_UPX) is not set/\1=y/' .config && make defconfig
           cat .config
 
-      - name: Debug via tmate
+      - name: Expand the disk image
         if: ${{ github.event.client_payload.expand == 'true' }}
         run: |
           cd ~
