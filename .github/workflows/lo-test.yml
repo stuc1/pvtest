@@ -105,7 +105,7 @@ jobs:
         run: |
           cd ~
           sudo umount lede && sudo losetup -d $LOOP_DEVICE
-          truncate -s +4G /mnt/lede.img
+          truncate -s +8G /mnt/lede.img
           sudo losetup -P --direct-io $LOOP_DEVICE /mnt/lede.img && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
           sudo btrfs fi resize max lede
           cd lede && rm dl/* -rf
