@@ -59,7 +59,7 @@ jobs:
           curl -sL https://raw.githubusercontent.com/stupidloud/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
           sudo umount lede || true
           sudo fdisk -l | grep loop | grep '30 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
-          rm -r lede* luci packages || true
+          rm -r lede* luci packages /mnt/lede.img || true
           sudo chown $USER:$(id -gn) /mnt
           for i in {1..20}
           do
