@@ -136,13 +136,17 @@ jobs:
           ulimit -SHn 65000
           cd ~/lede
           while true; do make download -j && break || true; done
-          [ `nproc` -lt 8 ] && con = `nproc`/2+3 || con = `nproc`
-          make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile package/install target/install | tee debug-build.log
-          if [ ! -e ~/lede/bin/targets/*/*/*imagebuilder*xz ]; then
-          df -h
-          make V=sc
-          fi
+          [ `nproc` -gt 8 ] && con=$[`nproc`/2+3] || con=`nproc`
+          if [ -d build_dir ]; then
+            make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile package/install target/install | tee debug-build.log
+            if [ ! -e ~/lede/bin/targets/*/*/*imagebuilder*xz ]; then
+            df -h
+            make V=sc
+            fi
           mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
+          else
+            make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile
+          fi
 
           echo "======================="
           echo "Space usage:"
@@ -157,8 +161,7 @@ jobs:
           cd
           mkdir -p ./artifact/buildinfo
           cd lede
-          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ../artifact/buildinfo/
-          cp -rf .config ../artifact/buildinfo/
+          cp -rf .config $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ../artifact/buildinfo/
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
           cd ..
