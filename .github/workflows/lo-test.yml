@@ -140,13 +140,8 @@ jobs:
           make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile package/install target/install | tee debug-build.log
           if [ ! -e ~/lede/bin/targets/*/*/*imagebuilder*xz ]; then
           df -h
-<<<<<<< HEAD
-          make IGNORE_ERRORS=1 V=sc
-          fi          
-=======
           make V=sc
           fi
->>>>>>> master
           mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
 
           echo "======================="
