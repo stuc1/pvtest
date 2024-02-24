@@ -2,14 +2,6 @@ name: Repo Dispatcher
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'select code branch to build'
-        default: 'master'
-        required: true
-      device:
-        description: 'select device to build'
-        default: 'r2s'
-        required: true
       debug:
         type: choice
         description: 'debug?'
@@ -17,6 +9,22 @@ on:
         - true
         - false
         default: 'false'
+        required: true
+      package_clean:
+        type: choice
+        description: 'check to make clean package'
+        options:
+        - true
+        - false
+        default: 'true'
+        required: true
+      branch:
+        description: 'select code branch to build'
+        default: 'master'
+        required: true
+      device:
+        description: 'select device to build'
+        default: 'r2s'
         required: true
       expand:
         type: choice
@@ -33,14 +41,6 @@ on:
         - true
         - false
         default: 'false'
-        required: true
-      package_clean:
-        type: choice
-        description: 'check to make clean package'
-        options:
-        - true
-        - false
-        default: 'true'
         required: true
       runner:
         type: choice
