@@ -39,6 +39,7 @@ line_number_INCLUDE_V2ray=$[`grep -m1 -n 'Include V2ray' package/custom/openwrt-
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
+sed -i '/LUCI_DEPENDS:=/LUCI_DEPENDS:=+iptables-mod-iprange +iptables-mod-socket /' package/custom/openwrt-passwall/luci-app-passwall/Makefile
 
 # inject the firmware version
 strDate=`TZ=UTC-8 date +%Y-%m-%d`
