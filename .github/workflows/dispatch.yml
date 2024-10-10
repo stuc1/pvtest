@@ -48,6 +48,7 @@ on:
         options:
         - ubuntu-latest
         - self-hosted
+        - depot-ubuntu-22.04-32
         required: true
 
 jobs:
