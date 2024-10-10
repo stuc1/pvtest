@@ -176,7 +176,7 @@ jobs:
           df -h .
 
       - name: Deliver buildinfo
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: OpenWrt_buildinfo
           path: ./artifact/buildinfo/
