@@ -49,6 +49,7 @@ on:
         - ubuntu-latest
         - self-hosted
         - depot-ubuntu-22.04-32
+        - ubicloud-standard-30
         - buildjet-32vcpu-ubuntu-2204
         - warp-ubuntu-2204-x64-32x
         required: true
