@@ -46,7 +46,7 @@ on:
         type: choice
         description: Where to run
         options:
-        - ubuntu-latest
+        - ubuntu-22.04
         - self-hosted
         - depot-ubuntu-22.04-32
         - ubicloud-standard-30
