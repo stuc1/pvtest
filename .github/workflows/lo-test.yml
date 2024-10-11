@@ -223,7 +223,7 @@ jobs:
 
       - name: Debug via tmate
         uses: stupidloud/ssh2actions@main
-        if: ${{ failure() && env.TG }}
+        if: ${{ failure() && env.TG && github.event.client_payload.runner=='ubuntu-22.04' }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
