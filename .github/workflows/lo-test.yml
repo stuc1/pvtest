@@ -243,6 +243,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEVICE: ${{ github.event.client_payload.device || github.event.inputs.device }}
+    permissions:
+      contents: write
 
     steps:
 
@@ -290,6 +292,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEVICE: ${{ github.event.client_payload.device || github.event.inputs.device }}
+    permissions:
+      contents: write
 
     steps:
 
