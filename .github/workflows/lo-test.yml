@@ -5,19 +5,18 @@ on:
   workflow_dispatch:
     inputs:
       device:
-        description: 'select device to build'
-        default: 'r2s'
+        description: "select device to build"
+        default: "r2s"
         required: false
       branch:
-        description: 'seleclt openwrt branch'
-        default: 'master'
+        description: "seleclt openwrt branch"
+        default: "master"
         required: false
 #concurrency:
-  #group: ${{ github.event.client_payload.device }}
-  #cancel-in-progress: false
+#group: ${{ github.event.client_payload.device }}
+#cancel-in-progress: false
 
 jobs:
-
   build_packages:
     name: Build ${{ github.event.client_payload.device || github.event.inputs.device }} packages
     timeout-minutes: 1440
@@ -29,7 +28,6 @@ jobs:
     if: github.repository_owner=='stuc1'
 
     steps:
-
       - name: Space cleanup
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -119,7 +117,7 @@ jobs:
           SSH_PUBKEY: ${{secrets.SSH_PUBKEY}}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
           NGROK_REGION: jp
-        
+
       - name: Clean build cache
         if: ${{ github.event.client_payload.package_clean == 'true' || github.event.inputs.device != '' }}
         run: |
@@ -242,7 +240,6 @@ jobs:
       contents: write
 
     steps:
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
@@ -291,7 +288,6 @@ jobs:
       contents: write
 
     steps:
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
