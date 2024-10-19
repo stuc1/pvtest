@@ -78,6 +78,7 @@ jobs:
           rm -rf tmp feeds pacakges/feeds
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          ./scripts/feeds install -a
           . $GITHUB_WORKSPACE/scripts/merge_packages.sh
           . $GITHUB_WORKSPACE/scripts/patches.sh
           cd
