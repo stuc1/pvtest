@@ -75,7 +75,7 @@ jobs:
       - name: Update feeds and packages
         run: |
           cd ~/lede
-          git revert --no-edit --author="John Doe <johndoe@example.com>" e2ebf13c3661c6803afddcea052bcb1836b3857e
+          git revert --no-commit e2ebf13c3661c6803afddcea052bcb1836b3857e
           rm -rf tmp feeds pacakges/feeds
           ./scripts/feeds update -a
           ./scripts/feeds install -a
