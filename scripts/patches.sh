@@ -124,7 +124,7 @@ if [[ $DEVICE == 'r1s' ]]; then
 
   sed -i '/luci/d' $GITHUB_WORKSPACE/common.seed $GITHUB_WORKSPACE/extra_packages.seed
 
-  git revert --no-edit f4405a9597eea92622b66f122de2fb738a605d5d 51459ab19ec99ac63090766dff5dbc8ae74ef714 
+  git revert --no-commit f4405a9597eea92622b66f122de2fb738a605d5d 51459ab19ec99ac63090766dff5dbc8ae74ef714 
 fi
 
 # fix for r1s-h3
