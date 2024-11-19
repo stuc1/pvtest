@@ -216,7 +216,7 @@ jobs:
           xargs -ri curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
           echo $ret | jq -r '.assets[] | select(.name == "ib-'$ARCH'.tar.xz").id' | \
           xargs -ri curl -X DELETE -H "$AUTH" "https://api.$cache_path/assets/{}"
-          ls *img.zst* ib-$ARCH.tar.xz | parallel --wc 'while true; do curl -T {} -H "$AUTH" -H "Content-Type: application/octet-stream" "https://uploads.$cache_path/$cache_repo_id/assets?name={}" && break || true; done'
+          ls *img.zst* ib-$DEVICE.tar.xz | parallel --wc 'while true; do curl -T {} -H "$AUTH" -H "Content-Type: application/octet-stream" "https://uploads.$cache_path/$cache_repo_id/assets?name={}" && break || true; done'
           set +e
           for i in {01..20}; do curl -sL --fail https://github.com/stupidloud/sshactions/releases/download/cache/lede.$ARCH.img.zst.$i || break; done | zstdmt -d -o /dev/null
           if [ $? -eq 0 ]; then break; fi
@@ -263,7 +263,7 @@ jobs:
           sudo apt update && sudo apt install qemu-utils
           sudo sysctl vm.swappiness=0
           ulimit -SHn 65000
-          curl -L https://github.com/stupidloud/sshactions/releases/download/cache/ib-$ARCH.tar.xz | tar -Jxvf -
+          curl -L https://github.com/stupidloud/sshactions/releases/download/cache/ib-$DEVICE.tar.xz | tar -Jxvf -
           mv *imagebuilder* ib && cd ib
           . $GITHUB_WORKSPACE/scripts/merge_files.sh
           mkdir -p files/local_feed && sudo mount --bind packages files/local_feed
