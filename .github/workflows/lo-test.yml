@@ -67,7 +67,7 @@ jobs:
           sudo fdisk -l | grep loop | grep '30 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
           rm -r lede* luci packages /mnt/lede.img || true
           sudo chown $USER:$(id -gn) /mnt
-          for i in {1..20}
+          for i in {01..20}
           do
             curl -sL --fail https://github.com/stupidloud/sshactions/releases/download/cache/lede.$ARCH.img.zst.0$i || break
           done | zstdmt -d -o /mnt/lede.img || (truncate -s 30g /mnt/lede.img && mkfs.btrfs -M /mnt/lede.img)
