@@ -50,8 +50,11 @@ jobs:
             x86)
               arch=amd64
               ;;
-            *)
+            r1s-h3)
               arch=arm
+              ;;
+            *)
+              arch=arm64
               ;;
             esac
           echo "ARCH=$arch" > $GITHUB_ENV
