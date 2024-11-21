@@ -72,7 +72,7 @@ jobs:
           sudo chown $USER:$(id -gn) /mnt
           for i in {01..20}
           do
-            curl -sL --fail https://github.com/stupidloud/sshactions/releases/download/cache/lede.$ARCH.img.zst.0$i || break
+            curl -sL --fail https://github.com/stupidloud/sshactions/releases/download/cache/lede.$ARCH.img.zst.$i || break
           done | zstdmt -d -o /mnt/lede.img || (truncate -s 30g /mnt/lede.img && mkfs.btrfs -M /mnt/lede.img)
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE /mnt/lede.img

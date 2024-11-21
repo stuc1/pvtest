@@ -95,24 +95,6 @@ case $DEVICE in
     ;;
 esac
 
-# add r6s support to Lean's repo
-if [[ $DEVICE == 'r6s' || $DEVICE == 'r6c' ]]; then
-  pip3 install pylibfdt
-  cd ~ && rm -rf immortalwrt/ && git clone -b master https://github.com/immortalwrt/immortalwrt && cd immortalwrt
-  git revert --no-commit 3bc7cfe0923ea23626a4e8c666c4a4b64a78f195 #cpufreq
-  mv include/kernel-6.1 ~/lede/include/
-  rsync -a --delete target/linux/rockchip/. ~/lede/target/linux/rockchip/. && rsync -a --delete target/linux/generic/. ~/lede/target/linux/generic/. && rsync -a --delete package/boot/. ~/lede/package/boot/. && cp -a include/u-boot.mk ~/lede/include/u-boot.mk
-  cd ~/lede
-  wget https://github.com/coolsnowwolf/lede/raw/master/target/linux/generic/hack-6.1/952-add-net-conntrack-events-support-multiple-registrant.patch
-  wget https://github.com/coolsnowwolf/lede/raw/master/target/linux/generic/hack-6.1/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
-  mv *.patch target/linux/generic/hack-6.1/
-  wget https://github.com/coolsnowwolf/lede/raw/master/target/linux/generic/pending-6.1/613-netfilter_optional_tcp_window_check.patch
-  mv *.patch target/linux/generic/pending-6.1/
-  sed -i "s/ucidef_set_interfaces_lan_wan 'eth0 eth1' 'eth2'/ucidef_set_interfaces_lan_wan 'eth1 eth0' 'eth2'/" target/linux/rockchip/armv8/base-files/etc/board.d/02_network
-  sed -i 's/DEFAULT_PACKAGES +=/DEFAULT_PACKAGES += autocore-arm/' target/linux/rockchip/Makefile
-  git diff --summary
-fi
-
 # add r1s support to Lean's repo
 if [[ $DEVICE == 'r1s' ]]; then
   cd ~ && rm -rf immortalwrt/ && git clone -b openwrt-18.06-k5.4 --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
