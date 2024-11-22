@@ -15,7 +15,7 @@ function merge_feed(){
         echo "src-git $1 $2" >> feeds.conf.default
     fi
     ./scripts/feeds update $1
-    ./scripts/feeds install -a -p $1
+    ./scripts/feeds install -a $1
 }
 
 rm -rf feeds/packages/net/mosdns package/feeds/packages/mosdns
