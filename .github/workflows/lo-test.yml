@@ -148,12 +148,9 @@ jobs:
           rm -rf dl;while true; do make download -j && break || true; done
           con=$[`nproc`+1]
           if [ -d build_dir/host/xz-* ]; then
-            make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile package/install target/install | tee debug-build.log
-            if [ ! -e ~/lede/bin/targets/*/*/*imagebuilder*xz ]; then
-            df -h
-            make V=sc
-            fi
-          mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
+            make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile | tee debug-build.log
+            make V=sc package/install target/install
+            mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
           else
             make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile
           fi
