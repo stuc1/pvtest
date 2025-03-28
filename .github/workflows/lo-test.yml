@@ -171,6 +171,7 @@ jobs:
           cp -rf .config $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ../artifact/buildinfo/
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
+          rm -rf bin tmp
           cd ..
           mv artifact $GITHUB_WORKSPACE
       - name: Clean build cache
@@ -179,7 +180,6 @@ jobs:
           cd ~/lede
           df -h .
           make clean
-          rm -rf bin tmp
           df -h .
 
       - name: Deliver buildinfo
