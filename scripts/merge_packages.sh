@@ -33,7 +33,6 @@ merge_package https://github.com/vernesong/OpenClash OpenClash/luci-app-openclas
 merge_package https://github.com/NateLol/luci-app-oled luci-app-oled
 merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/brook
 merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/chinadns-ng
-merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/trojan-go
 merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/trojan-plus
 merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/sing-box
 merge_package "-b main https://github.com/xiaorouji/openwrt-passwall" openwrt-passwall
