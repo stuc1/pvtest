@@ -31,7 +31,7 @@ merge_package https://github.com/messense/aliyundrive-webdav aliyundrive-webdav/
 merge_package "-b 18.06 https://github.com/jerrykuku/luci-theme-argon" luci-theme-argon
 merge_package https://github.com/vernesong/OpenClash OpenClash/luci-app-openclash
 merge_package https://github.com/NateLol/luci-app-oled luci-app-oled
-if [[ $DEVICE != 'r1s' ]]; then
+if [[ $DEVICE != 'r1s-h3' ]]; then
     merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/chinadns-ng
     merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/trojan-plus
     merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/sing-box
