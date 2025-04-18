@@ -147,7 +147,8 @@ jobs:
           cd ~/lede
           rm -rf dl;while true; do make download -j && break || true; done
           con=$[`nproc`+1]
-          if [ -d build_dir/host/xz-* ]; then
+          # Check if any directory starting with xz- exists in build_dir/host
+          if ls -d build_dir/host/xz-*/ > /dev/null 2>&1; then
             make -j$con IGNORE_ERRORS=1 tools/compile toolchain/compile buildinfo target/compile package/compile | tee debug-build.log
             make V=sc package/install target/install
             mv `ls ~/lede/bin/targets/*/*/*imagebuilder*xz` ~/ib-$DEVICE.tar.xz
