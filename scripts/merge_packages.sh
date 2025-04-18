@@ -31,10 +31,12 @@ merge_package https://github.com/messense/aliyundrive-webdav aliyundrive-webdav/
 merge_package "-b 18.06 https://github.com/jerrykuku/luci-theme-argon" luci-theme-argon
 merge_package https://github.com/vernesong/OpenClash OpenClash/luci-app-openclash
 merge_package https://github.com/NateLol/luci-app-oled luci-app-oled
-merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/chinadns-ng
-merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/trojan-plus
-merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/sing-box
-merge_package "-b main https://github.com/xiaorouji/openwrt-passwall" openwrt-passwall
+if [[ $DEVICE != 'r1s' ]]; then
+    merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/chinadns-ng
+    merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/trojan-plus
+    merge_package https://github.com/xiaorouji/openwrt-passwall-packages openwrt-passwall-packages/sing-box
+    merge_package "-b main https://github.com/xiaorouji/openwrt-passwall" openwrt-passwall
+fi
 merge_package https://github.com/jerrykuku/lua-maxminddb lua-maxminddb
 merge_package https://github.com/kongfl888/luci-app-adguardhome luci-app-adguardhome
 drop_package luci-app-cd8021x
