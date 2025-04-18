@@ -97,16 +97,16 @@ esac
 
 # add r1s support to Lean's repo
 if [[ $DEVICE == 'r1s' ]]; then
-  cd ~ && rm -rf immortalwrt/ && git clone -b openwrt-18.06-k5.4 --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
-  rsync -a --delete target/linux/sunxi/. ~/lede/target/linux/sunxi/. && rsync -a --delete package/boot/. ~/lede/package/boot/.
-  cd ~/lede
-  sed -i 's/kmod-rtl8189es//;s/wpad-basic-openssl/wpad-basic-wolfssl/' target/linux/sunxi/image/cortexa53.mk
-  git diff --summary
-  merge_package "-b openwrt-18.06-k5.4 https://github.com/immortalwrt/immortalwrt" immortalwrt/package/emortal/autocore
+  #cd ~ && rm -rf immortalwrt/ && git clone -b openwrt-18.06-k5.4 --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
+  #rsync -a --delete target/linux/sunxi/. ~/lede/target/linux/sunxi/. && rsync -a --delete package/boot/. ~/lede/package/boot/.
+  #cd ~/lede
+  #sed -i 's/kmod-rtl8189es//;s/wpad-basic-openssl/wpad-basic-wolfssl/' target/linux/sunxi/image/cortexa53.mk
+  #git diff --summary
+  #merge_package "-b openwrt-18.06-k5.4 https://github.com/immortalwrt/immortalwrt" immortalwrt/package/emortal/autocore
 
   sed -i '/luci/d' $GITHUB_WORKSPACE/common.seed $GITHUB_WORKSPACE/extra_packages.seed
 
-  git revert --no-commit f4405a9597eea92622b66f122de2fb738a605d5d 51459ab19ec99ac63090766dff5dbc8ae74ef714 
+  #git revert --no-commit f4405a9597eea92622b66f122de2fb738a605d5d 51459ab19ec99ac63090766dff5dbc8ae74ef714 
 fi
 
 # fix for r1s-h3
