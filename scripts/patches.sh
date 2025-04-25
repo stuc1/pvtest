@@ -79,21 +79,6 @@ git apply cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
 rm cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
 sed -i 's/pwmchip1/pwmchip0/' target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol.sh target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol-direct.sh
 
-case $DEVICE in
-  r2s|r2c|r1p|r1p-lts)
-    # change the voltage value for over-clock stablization
-    config_file_cpufreq=`find package/ -follow -type f -path '*/luci-app-cpufreq/root/etc/config/cpufreq'`
-    truncate -s-1 $config_file_cpufreq
-    echo -e "\toption governor0 'schedutil'" >> $config_file_cpufreq
-    echo -e "\toption minfreq0 '816000'" >> $config_file_cpufreq
-    echo -e "\toption maxfreq0 '1512000'\n" >> $config_file_cpufreq
-
-    line_number_CONFIG_CRYPTO_LIB_BLAKE2S=$[`grep -n 'CONFIG_CRYPTO_LIB_BLAKE2S' package/kernel/linux/modules/crypto.mk | cut -d: -f 1`+1]
-    sed -i $line_number_CONFIG_CRYPTO_LIB_BLAKE2S' s/HIDDEN:=1/DEPENDS:=@(LINUX_5_4||LINUX_5_10)/' package/kernel/linux/modules/crypto.mk
-    sed -i 's/libblake2s.ko@lt5.9/libblake2s.ko/;s/libblake2s-generic.ko@lt5.9/libblake2s-generic.ko/' package/kernel/linux/modules/crypto.mk
-    ;;
-esac
-
 # add r1s support to Lean's repo
 if [[ $DEVICE == 'r1s' ]]; then
   #cd ~ && rm -rf immortalwrt/ && git clone -b openwrt-18.06-k5.4 --depth=1 https://github.com/immortalwrt/immortalwrt && cd immortalwrt
@@ -113,11 +98,6 @@ if [[ $DEVICE == 'r1s-h3' ]]; then
   sed -i 's/kmod-leds-gpio//' target/linux/sunxi/image/cortexa7.mk
 fi
 
-# ...
-sed -i 's/rk3399_bl31_v1.35.elf/rk3399_bl31_v1.36.elf/;s/rk3568_ddr_1560MHz_v1.13.bin/rk3568_ddr_1560MHz_v1.18.bin/;s/rk3568_bl31_v1.34.elf/rk3568_bl31_v1.43.elf/' package/boot/uboot-rockchip/Makefile
-sed -i 's/kmod-usb-net-rtl8152/kmod-usb-net-rtl8152-vendor/' target/linux/rockchip/image/armv8.mk target/linux/sunxi/image/cortexa53.mk target/linux/sunxi/image/cortexa7.mk
 
 ## ugly fix of the read-only issue
 sed -i '3 i sed -i "/^exit.*/i\\/bin\\/mount -o remount,rw /" /etc/rc.local' `find package -type f -path '*/default-settings/files/*-default-settings'`
-
-sed -i 's/\+1017\,12/+1017\,13/;/ifdef CONFIG_MBO/i+NEED_GAS=y' package/network/services/hostapd/patches/200-multicall.patch
