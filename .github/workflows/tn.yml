@@ -92,9 +92,8 @@ jobs:
           cd openwrt
           echo "src-git helloworld https://github.com/stupidloud/helloworld" >> ./feeds.conf.default
           ./scripts/feeds update -a
-          # Remove default mosdns packages to avoid conflicts with helloworld source
-          rm -rf feeds/packages/net/mosdns package/feeds/packages/mosdns
-          rm -rf feeds/luci/applications/luci-app-mosdns package/feeds/luci/luci-app-mosdns
+          ./scripts/feeds uninstall luci-app-mosdns
+          ./scripts/feeds install -f -p helloworld mosdns
           ./scripts/feeds install -a
 
       - name: 应用设备配置
