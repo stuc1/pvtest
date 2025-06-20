@@ -115,6 +115,7 @@ jobs:
           else
             echo "No device specified, using default configuration"
           fi
+          echo "CONFIG_TESTING_KERNEL=y" >> .config
 
       - name: 生成配置文件
         run: |
