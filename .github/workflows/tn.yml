@@ -72,11 +72,6 @@ jobs:
         with:
           path: config
 
-      - name: 克隆 OpenWrt 源码
-        run: |
-          git clone --depth 1 https://github.com/coolsnowwolf/lede.git openwrt
-          cd openwrt
-
       - name: 释放磁盘空间
         uses: jlumbroso/free-disk-space@main
         with:
@@ -90,6 +85,10 @@ jobs:
           haskell: true
           large-packages: true
           swap-storage: true
+
+      - name: 克隆 OpenWrt 源码
+        run: |
+          git clone https://github.com/coolsnowwolf/lede.git openwrt
 
       - name: 更新软件源
         run: |
