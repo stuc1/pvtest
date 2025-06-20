@@ -42,12 +42,12 @@ jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt Firmware
+    name: 构建 OpenWrt 固件 - ${{ github.event.inputs.device || 'r4s' }}
 
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Space cleanup and Initialization environment
+      - name: 清理空间和初始化环境
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -63,17 +63,17 @@ jobs:
           sudo -E apt clean
           sudo -E timedatectl set-timezone "Asia/Shanghai"
 
-      - name: Checkout config repository
+      - name: 检出配置仓库
         uses: actions/checkout@v4
         with:
           path: config
 
-      - name: Clone OpenWrt source
+      - name: 克隆 OpenWrt 源码
         run: |
           git clone --depth 1 https://github.com/coolsnowwolf/lede.git openwrt
           cd openwrt
 
-      - name: Free Disk Space (Ubuntu)
+      - name: 释放磁盘空间
         uses: jlumbroso/free-disk-space@main
         with:
           # this might remove tools that are actually needed,
@@ -87,7 +87,7 @@ jobs:
           large-packages: true
           swap-storage: true
 
-      - name: Update feeds
+      - name: 更新软件源
         run: |
           cd openwrt
           echo "src-git helloworld https://github.com/stupidloud/helloworld" >> ./feeds.conf.default
@@ -97,7 +97,7 @@ jobs:
           rm -rf feeds/luci/applications/luci-app-mosdns package/feeds/luci/luci-app-mosdns
           ./scripts/feeds install -a
 
-      - name: Apply device configuration
+      - name: 应用设备配置
         run: |
           cd openwrt
           if [ "${{ github.event.inputs.device }}" != "" ]; then
@@ -114,17 +114,17 @@ jobs:
             echo "No device specified, using default configuration"
           fi
 
-      - name: Generate configuration file
+      - name: 生成配置文件
         run: |
           cd openwrt
           make defconfig
 
-      - name: Download packages
+      - name: 下载软件包
         run: |
           cd openwrt
           make download -j4
 
-      - name: Compile firmware
+      - name: 编译固件
         run: |
           cd openwrt
           make -j$(nproc) || make -j1 V=s
@@ -137,7 +137,7 @@ jobs:
           du -h --max-depth=1 ./build_dir
           du -h --max-depth=1 ./bin
 
-      - name: Prepare artifact
+      - name: 准备构建产物
         run: |
           cd openwrt
           mkdir -p ./artifact/package
@@ -146,20 +146,20 @@ jobs:
           cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
           cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
 
-      - name: Upload buildinfo
+      - name: 上传构建信息
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_buildinfo
+          name: OpenWrt_buildinfo_${{ github.event.inputs.device || 'r4s' }}
           path: ./openwrt/artifact/buildinfo/
 
-      - name: Upload package
+      - name: 上传软件包
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_package
+          name: OpenWrt_package_${{ github.event.inputs.device || 'r4s' }}
           path: ./openwrt/artifact/package/
 
-      - name: Upload firmware
+      - name: 上传固件
         uses: actions/upload-artifact@v4
         with:
-          name: OpenWrt_firmware
+          name: OpenWrt_firmware_${{ github.event.inputs.device || 'r4s' }}
           path: ./openwrt/bin/targets/
