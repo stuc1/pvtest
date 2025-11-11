@@ -115,7 +115,7 @@ jobs:
           else
             echo "No device specified, using default configuration"
           fi
-          echo "PACKAGE_luci-app-ssr-plus_INCLUDE_Hysteria" >> .config
+          echo "CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Hysteria" >> .config
           echo "CONFIG_TESTING_KERNEL=y" >> .config
           echo "CONFIG_PACKAGE_upx=y" >> .config
 
