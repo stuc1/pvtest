@@ -100,20 +100,18 @@ jobs:
           ./scripts/feeds install -a
 
       - name: 应用设备配置
+        env:
+          DEVICE: ${{ github.event.inputs.device || 'r4s' }}
         run: |
           cd openwrt
-          if [ "${{ github.event.inputs.device }}" != "" ]; then
-            echo "Using device configuration: ${{ github.event.inputs.device }}"
-            if [ -f "../config/${{ github.event.inputs.device }}.config.seed" ]; then
-              head -3 "../config/${{ github.event.inputs.device }}.config.seed" > .config
-              echo "Applied first 3 lines from ${{ github.event.inputs.device }}.config.seed:"
-              cat .config
-            else
-              echo "Configuration file ${{ github.event.inputs.device }}.config.seed not found"
-              exit 1
-            fi
+          echo "Using device configuration: $DEVICE"
+          if [ -f "../config/$DEVICE.config.seed" ]; then
+            head -3 "../config/$DEVICE.config.seed" > .config
+            echo "Applied first 3 lines from $DEVICE.config.seed:"
+            cat .config
           else
-            echo "No device specified, using default configuration"
+            echo "Configuration file $DEVICE.config.seed not found"
+            exit 1
           fi
           echo "CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Hysteria=y" >> .config
           echo "CONFIG_TESTING_KERNEL=y" >> .config
