@@ -114,6 +114,7 @@ jobs:
             exit 1
           fi
           echo "CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Hysteria=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y" >> .config
           echo "CONFIG_TESTING_KERNEL=y" >> .config
           echo "CONFIG_PACKAGE_upx=y" >> .config
 
