@@ -57,7 +57,7 @@ jobs:
           sudo -E locale-gen zh_CN.UTF-8
           sudo -E update-locale LANG=zh_CN.UTF-8
           echo "LANG=zh_CN.UTF-8" >> $GITHUB_ENV
-          docker rmi `docker images -q`
+          docker image prune -a -f
           sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
           sudo -E apt-mark hold grub-efi-amd64-signed
           sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
