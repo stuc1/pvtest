@@ -1,0 +1,159 @@
+# 
+# <https://github.com/KFERMercer/OpenWrt-CI>
+#
+# Copyright (C) 2019 P3TERX
+#
+# Copyright (C) 2020 KFERMercer
+#
+name: OpenWrt-CI
+
+on:
+  schedule:
+    - cron: 0 20 * * *
+  workflow_dispatch:
+    inputs:
+      device:
+        description: 'Device to build (e.g., r4s, r2s, x86, etc.)'
+        required: true
+        default: 'r4s'
+        type: choice
+        options:
+          - r4s
+          - r4se
+          - r2s
+          - r2c
+          - r1s
+          - r1s-h3
+          - r1p
+          - r1p-lts
+          - r5s
+          - r5c
+          - r6s
+          - r6c
+          - x86
+          - d2
+          - e20c
+          - e25
+
+permissions:
+  contents: read
+
+jobs:
+
+  build_openwrt:
+
+    name: 构建 ImmortalWrt 固件 - ${{ github.event.inputs.device || 'r4s' }}
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: 释放磁盘空间
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - name: 清理空间和初始化环境
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E timedatectl set-timezone "Asia/Shanghai"
+          sudo -E apt update
+          sudo -E apt -y install language-pack-zh-hans
+          sudo -E locale-gen zh_CN.UTF-8
+          sudo -E update-locale LANG=zh_CN.UTF-8
+          echo "LANG=zh_CN.UTF-8" >> $GITHUB_ENV
+          docker rmi `docker images -q`
+          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          sudo -E apt-mark hold grub-efi-amd64-signed
+          sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
+          sudo -E apt -y full-upgrade
+          sudo -E apt -y install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstdsudo -E systemctl daemon-reload
+          sudo -E apt -y autoremove --purge
+          sudo -E apt clean
+
+      - name: 检出配置仓库
+        uses: actions/checkout@v4
+        with:
+          path: config
+
+      - name: 克隆 OpenWrt 源码
+        run: |
+          git clone https://github.com/immortalwrt/immortalwrt openwrt
+
+      - name: 更新软件源
+        run: |
+          cd openwrt
+          echo "src-git homeproxy https://github.com/immortalwrt/homeproxy.git" >> ./feeds.conf.default
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: 应用设备配置
+        env:
+          DEVICE: ${{ github.event.inputs.device || 'r4s' }}
+        run: |
+          cd openwrt
+          echo "Using device configuration: $DEVICE"
+          if [ -f "../config/$DEVICE.config.seed" ]; then
+            head -3 "../config/$DEVICE.config.seed" > .config
+            echo "Applied first 3 lines from $DEVICE.config.seed:"
+            cat .config
+          else
+            echo "Configuration file $DEVICE.config.seed not found"
+            exit 1
+          fi
+          echo "CONFIG_PACKAGE_luci-app-homeproxy=y" >> .config
+
+      - name: 生成配置文件
+        run: |
+          cd openwrt
+          make defconfig
+
+      - name: 下载软件包
+        run: |
+          cd openwrt
+          make download -j4
+
+      - name: 编译固件
+        run: |
+          cd openwrt
+          make -j$(nproc) || make -j1 V=s
+          echo "======================="
+          echo "Space usage:"
+          echo "======================="
+          df -h
+          echo "======================="
+          du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
+          du -h --max-depth=1 ./build_dir
+          du -h --max-depth=1 ./bin
+
+      - name: 准备构建产物
+        run: |
+          cd openwrt
+          mkdir -p ./artifact/package
+          mkdir -p ./artifact/buildinfo
+          rm -rf $(find ./bin/targets/ -type d -name "packages")
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
+          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
+
+      - name: 上传构建信息
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_buildinfo_${{ github.event.inputs.device || 'r4s' }}
+          path: ./openwrt/artifact/buildinfo/
+
+      - name: 上传软件包
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_package_${{ github.event.inputs.device || 'r4s' }}
+          path: ./openwrt/artifact/package/
+
+      - name: 上传固件
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_firmware_${{ github.event.inputs.device || 'r4s' }}
+          path: ./openwrt/bin/targets/
