@@ -110,6 +110,9 @@ jobs:
           fi
           echo "CONFIG_PACKAGE_luci-app-homeproxy=y" >> .config
           echo "CONFIG_PACKAGE_luci-app-frpc=y" >> .config
+          echo "CONFIG_PACKAGE_luci=y" >> .config
+          echo "CONFIG_PACKAGE_luci-base=y" >> .config
+          echo "CONFIG_PACKAGE_luci-i18n-zh-cn=y" >> .config
 
       - name: 生成配置文件
         run: |
