@@ -113,11 +113,30 @@ jobs:
           echo "CONFIG_PACKAGE_luci=y" >> .config
           echo "CONFIG_PACKAGE_luci-base=y" >> .config
           echo "CONFIG_PACKAGE_luci-i18n-zh-cn=y" >> .config
+          echo "CONFIG_CCACHE=y" >> .config
 
       - name: 生成配置文件
         run: |
           cd openwrt
           make defconfig
+
+      - name: 计算缓存 mixkey
+        id: mixkey
+        run: |
+          cd openwrt
+          board=$(sed -n 's/^CONFIG_TARGET_BOARD="\(.*\)"$/\1/p' .config)
+          subtarget=$(sed -n 's/^CONFIG_TARGET_SUBTARGET="\(.*\)"$/\1/p' .config)
+          echo "value=${board}-${subtarget}" >> "$GITHUB_OUTPUT"
+          echo "mixkey: ${board}-${subtarget}"
+
+      - name: 缓存工具链与 ccache
+        uses: stupidloud/cachewrtbuild@main
+        with:
+          prefix: openwrt
+          mixkey: ${{ steps.mixkey.outputs.value }}
+          ccache: 'true'
+          toolchain: 'true'
+          skip: 'true'
 
       - name: 下载软件包
         run: |
