@@ -1,0 +1,114 @@
+name: Bench ARM vs x64 (r4s, cold)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: bench-${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    steps:
+      - name: 释放磁盘空间
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - name: Host 信息
+        run: |
+          {
+            echo "## Runner: ${{ matrix.runner }}"
+            echo ""
+            echo "- arch: \`$(uname -m)\`"
+            echo "- cpu: \`$(lscpu | sed -n 's/^Model name: *//p' | head -1)\`"
+            echo "- nproc: \`$(nproc)\`"
+            echo "- mem: \`$(free -h | awk '/^Mem:/ {print $2}')\`"
+            echo "- disk free: \`$(df -h / | awk 'NR==2 {print $4}')\`"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 安装依赖
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          common="ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext git gnutls-dev gperf haveged help2man intltool libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd"
+          if [ "$(uname -m)" = "x86_64" ]; then
+            sudo apt -y install $common gcc-multilib g++-multilib lib32gcc-s1 libc6-dev-i386
+          else
+            sudo apt -y install $common
+          fi
+
+      - name: 检出配置仓库
+        uses: actions/checkout@v4
+        with:
+          path: config
+
+      - name: 克隆 OpenWrt 源码
+        run: git clone --depth=1 https://github.com/immortalwrt/immortalwrt openwrt
+
+      - name: 更新软件源
+        run: |
+          cd openwrt
+          echo "src-git homeproxy https://github.com/immortalwrt/homeproxy.git" >> ./feeds.conf.default
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: 应用 r4s 配置
+        run: |
+          cd openwrt
+          head -3 ../config/r4s.config.seed > .config
+          echo "CONFIG_PACKAGE_luci-app-homeproxy=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-frpc=y" >> .config
+          echo "CONFIG_PACKAGE_luci=y" >> .config
+          echo "CONFIG_PACKAGE_luci-base=y" >> .config
+          echo "CONFIG_PACKAGE_luci-i18n-zh-cn=y" >> .config
+          make defconfig
+
+      - name: 下载源码包 (不计时)
+        run: |
+          cd openwrt
+          make download -j4
+
+      - name: 编译 tools
+        run: |
+          cd openwrt
+          /usr/bin/time -f "%e" -o /tmp/tools.time make tools/install -j$(nproc)
+
+      - name: 编译 toolchain
+        run: |
+          cd openwrt
+          /usr/bin/time -f "%e" -o /tmp/toolchain.time make toolchain/install -j$(nproc)
+
+      - name: 编译 target (含所有包)
+        run: |
+          cd openwrt
+          /usr/bin/time -f "%e" -o /tmp/target.time make -j$(nproc)
+
+      - name: 汇总耗时
+        if: always()
+        run: |
+          {
+            echo "## Phase timings (${{ matrix.runner }})"
+            echo ""
+            echo "| phase | seconds |"
+            echo "|---|---|"
+            for phase in tools toolchain target; do
+              if [ -f /tmp/$phase.time ]; then
+                echo "| $phase | $(cat /tmp/$phase.time) |"
+              else
+                echo "| $phase | (failed) |"
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
