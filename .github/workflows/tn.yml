@@ -94,6 +94,7 @@ jobs:
       - name: 更新软件源
         run: |
           cd openwrt
+          sed -i '/^src-git helloworld /d' ./feeds.conf.default
           echo "src-git helloworld https://github.com/stupidloud/helloworld" >> ./feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds uninstall luci-app-mosdns

@@ -45,7 +45,7 @@ jobs:
 
     name: 构建 ImmortalWrt 固件 - ${{ github.event.inputs.device || 'r4s' }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: 释放磁盘空间
